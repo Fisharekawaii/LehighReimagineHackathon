@@ -1,0 +1,624 @@
+"use client";
+import React, { useEffect, useState, useCallback } from "react";
+import {
+  LayoutDashboard,
+  Wallet,
+  Map,
+  Compass,
+  Users,
+  Plus,
+  ChevronDown,
+  ArrowUpRight,
+  ArrowRight,
+  Sparkles,
+  Menu,
+  X,
+  Check,
+  RefreshCw,
+  LogOut,
+  Link,
+  Sun,
+  Briefcase,
+  CalendarDays,
+} from "lucide-react";
+import { api } from "./lib/api";
+import { money, dateRange, firstName } from "./lib/format";
+import {
+  Brand,
+  Avatar,
+  Button,
+  Tag,
+  Empty,
+  ErrorMessage,
+} from "./components/UI";
+import { CreateTrip, JoinTrip, InviteTrip } from "./features/trips/TripForms";
+import Overview from "./features/trips/Overview";
+import { Budget, ItemForm } from "./features/budget/Budget";
+import { Pool, ContributionForm } from "./features/pool/Pool";
+import Itinerary from "./features/itinerary/Itinerary";
+import Explore from "./features/explore/Explore";
+import Assistant from "./features/assistant/Assistant";
+import { themeImages } from "./config/assets";
+const tabs = [
+  ["overview", "Overview", LayoutDashboard],
+  ["budget", "Plan & budget", Wallet],
+  ["itinerary", "Itinerary & map", Map],
+  ["explore", "Explore", Compass],
+  ["pool", "Group & pool", Users],
+];
+export default function App() {
+  const [user, setUser] = useState(null),
+    [profiles, setProfiles] = useState([]),
+    [trips, setTrips] = useState([]),
+    [tripId, setTripId] = useState(null),
+    [tab, setTab] = useState("overview"),
+    [modal, setModal] = useState(null),
+    [loading, setLoading] = useState(true),
+    [error, setError] = useState(""),
+    [busy, setBusy] = useState(false),
+    [toast, setToast] = useState(null),
+    [mobile, setMobile] = useState(false),
+    [joinCode, setJoinCode] = useState("");
+  const trip = trips.find((t) => t.id === tripId);
+  const notify = useCallback(
+    (text, isError = false) => setToast({ text, isError }),
+    [],
+  );
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 5500);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+  async function loadTrips() {
+    const data = await api("/trips");
+    setTrips(data);
+    return data;
+  }
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const p = await api("/demo-users");
+        if (!active) return;
+        setProfiles(p);
+        const code =
+          new URLSearchParams(window.location.search).get("join") || "";
+        setJoinCode(code);
+        try {
+          const u = await api("/me");
+          if (!active) return;
+          setUser(u);
+          await loadTrips();
+          if (code) setModal({ type: "join" });
+        } catch (e) {
+          if (e.status !== 401) throw e;
+        }
+      } catch (e) {
+        if (active) setError(e.message);
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+  // TODO(SYNC-01): Replace focus refresh with subscriptions when real collaboration is added.
+  useEffect(() => {
+    if (!user) return;
+    const refresh = () => {
+      api("/trips")
+        .then(setTrips)
+        .catch(() => {});
+    };
+    window.addEventListener("focus", refresh);
+    return () => window.removeEventListener("focus", refresh);
+  }, [user]);
+  function update(next) {
+    setTrips((prev) =>
+      prev.some((t) => t.id === next.id)
+        ? prev.map((t) => (t.id === next.id ? next : t))
+        : [...prev, next],
+    );
+  }
+  function savedTrip(next) {
+    update(next);
+    setTripId(next.id);
+    setTab("overview");
+    setModal(null);
+    if (joinCode) {
+      setJoinCode("");
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+    notify("You’re in. Let’s make a good trip.");
+  }
+  function savedItem(next) {
+    update(next);
+    setModal(null);
+    notify("Saved to your trip.");
+  }
+  async function login(id) {
+    setBusy(true);
+    setError("");
+    try {
+      const u = await api("/demo-login", "POST", { userId: id });
+      setUser(u);
+      setTripId(null);
+      await loadTrips();
+      setModal(joinCode ? { type: "join" } : null);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function logout() {
+    try {
+      await api("/logout", "POST");
+      setUser(null);
+      setTripId(null);
+      setTrips([]);
+    } catch (e) {
+      notify(e.message, true);
+    }
+  }
+  const onAdd = (category = "Stays") => setModal({ type: "item", category }),
+    onEdit = (item) => setModal({ type: "item", item });
+  if (loading)
+    return (
+      <div className="loading-screen">
+        <Brand />
+        <RefreshCw className="spin" size={23} />
+        <p>Making room for your next adventure…</p>
+      </div>
+    );
+  if (!user)
+    return (
+      <div className="login-layout">
+        <div
+          className="login-art"
+          style={{ "--travel-photo": `url(${themeImages.coast})` }}
+        >
+          <Brand />
+          <div className="login-story">
+            <span className="hero-kicker">
+              <Sun size={17} /> Less logistics. More living.
+            </span>
+            <h1>
+              Good trips.
+              <br />
+              Great people.
+              <br />
+              <em>All together.</em>
+            </h1>
+            <p>
+              A shared place for the plans, the possibilities,
+              <br />
+              and who’s bringing what to the table.
+            </p>
+          </div>
+          <span className="login-caption">
+            A little time away goes a long way.
+          </span>
+        </div>
+        <main className="login-panel">
+          <Tag>Hackathon preview</Tag>
+          <h2>
+            Your next adventure
+            <br />
+            starts with you.
+          </h2>
+          <p className="muted">Choose a demo profile to explore DayTripper.</p>
+          <div className="profile-list">
+            {profiles.map((p) => (
+              <button key={p.id} disabled={busy} onClick={() => login(p.id)}>
+                <Avatar user={p} />
+                <span>
+                  <strong>{p.name}</strong>
+                  <small>Demo traveler</small>
+                </span>
+                <ArrowRight size={19} />
+              </button>
+            ))}
+          </div>
+          <ErrorMessage error={error} />
+          {!profiles.length && (
+            <Button onClick={() => window.location.reload()}>
+              Retry connection
+            </Button>
+          )}
+          <div className="demo-disclosure">
+            <span className="status-dot" />
+            <p>
+              Demo accounts share test data. No passwords, real cards, or real
+              payments. Real sign-in is planned.
+            </p>
+          </div>
+        </main>
+      </div>
+    );
+  return (
+    <div className="app-shell">
+      <aside className={"sidebar " + (mobile ? "open" : "")}>
+        <Brand />
+        <button
+          className="mobile-close icon-btn"
+          onClick={() => setMobile(false)}
+          aria-label="Close menu"
+        >
+          <X />
+        </button>
+        <button
+          className={"workspace-switch " + (!trip ? "selected" : "")}
+          onClick={() => {
+            setTripId(null);
+            setMobile(false);
+          }}
+        >
+          <span className="workspace-icon">
+            <Briefcase size={19} />
+          </span>
+          <span>
+            <strong>My getaways</strong>
+            <small>
+              {trips.length} {trips.length === 1 ? "trip" : "trips"} in the
+              making
+            </small>
+          </span>
+          <ChevronDown size={16} />
+        </button>
+        <p className="nav-caption">{trip ? "YOUR TRIP" : "YOUR SPACE"}</p>
+        <nav>
+          {tabs.map(([id, label, Icon]) => (
+            <button
+              key={id}
+              disabled={!trip}
+              className={trip && tab === id ? "active" : ""}
+              onClick={() => {
+                setTab(id);
+                setMobile(false);
+              }}
+            >
+              <Icon size={19} />
+              <span>
+                {id === "pool" && trip?.mode === "planning"
+                  ? "Your group"
+                  : label}
+              </span>
+              {id === "pool" &&
+                trip?.payments.some((p) => p.status === "pending") && (
+                  <span className="nav-dot" />
+                )}
+            </button>
+          ))}
+        </nav>
+        <button
+          className="new-trip-nav"
+          onClick={() => {
+            setModal({ type: "create" });
+            setMobile(false);
+          }}
+        >
+          <Plus size={18} />
+          New trip
+        </button>
+        <div className="sidebar-bottom">
+          <div className="assistant-promo">
+            <span className="sparkle-tile">
+              <Sparkles size={19} />
+            </span>
+            <h3>
+              Less planning.
+              <br />
+              More possibility.
+            </h3>
+            <p>Your travel copilot is taking shape.</p>
+            <button
+              disabled={!trip}
+              onClick={() => {
+                setModal({ type: "assistant" });
+                setMobile(false);
+              }}
+            >
+              Try demo commands <ArrowUpRight size={16} />
+            </button>
+          </div>
+          <div className="user-profile">
+            <Avatar user={user} />
+            <div>
+              <strong>{firstName(user)}</strong>
+              <small>Demo account</small>
+            </div>
+            <button
+              className="icon-btn"
+              title="Switch demo profile"
+              aria-label="Switch demo profile"
+              onClick={logout}
+            >
+              <LogOut size={17} />
+            </button>
+          </div>
+        </div>
+      </aside>
+      {mobile && (
+        <div className="mobile-backdrop" onClick={() => setMobile(false)} />
+      )}
+      <div className="workspace">
+        <header className="topbar">
+          <div className="breadcrumbs">
+            <button
+              className="mobile-menu icon-btn"
+              onClick={() => setMobile(true)}
+              aria-label="Open menu"
+            >
+              <Menu />
+            </button>
+            <button onClick={() => setTripId(null)}>My getaways</button>
+            {trip && (
+              <>
+                <span>/</span>
+                <span>{trip.title}</span>
+              </>
+            )}
+          </div>
+          <div className="topbar-actions">
+            <span className="saved-indicator">
+              <span className="status-dot" />
+              Saved trips · demo
+            </span>
+            <button
+              className="icon-btn"
+              aria-label="Refresh trips"
+              onClick={async () => {
+                try {
+                  await loadTrips();
+                  notify("Up to date.");
+                } catch (e) {
+                  notify(e.message, true);
+                }
+              }}
+            >
+              <RefreshCw size={16} />
+            </button>
+            {trip && (
+              <Button
+                variant="secondary small-btn"
+                onClick={() => setModal({ type: "invite" })}
+              >
+                <Users size={16} />
+                Invite friends
+              </Button>
+            )}
+          </div>
+        </header>
+        <main className="main-content">
+          {!trip ? (
+            <>
+              <div className="home-heading">
+                <div>
+                  <p className="eyebrow">A change of scenery starts here</p>
+                  <h1>Where to next, {firstName(user)}?</h1>
+                  <p className="muted">
+                    Big adventures. Long weekends. A plan everyone’s part of.
+                  </p>
+                </div>
+                <div className="home-actions">
+                  <Button
+                    variant="secondary"
+                    onClick={() => setModal({ type: "join" })}
+                  >
+                    <Link size={16} />
+                    Join a trip
+                  </Button>
+                  <Button onClick={() => setModal({ type: "create" })}>
+                    <Plus size={17} />
+                    Create a trip
+                  </Button>
+                </div>
+              </div>
+              {trips.length ? (
+                <div className="trip-grid">
+                  {trips.map((t) => (
+                    <button
+                      className={"trip-tile " + t.theme}
+                      key={t.id}
+                      onClick={() => {
+                        setTripId(t.id);
+                        setTab("overview");
+                      }}
+                    >
+                      <div
+                        className="trip-tile-image"
+                        style={{
+                          "--travel-photo": `url(${themeImages[t.theme]})`,
+                        }}
+                      >
+                        <Tag>
+                          {t.mode === "pool" ? "Shared pool" : "Planning only"}
+                        </Tag>
+                        <span>
+                          <ArrowUpRight size={21} />
+                        </span>
+                      </div>
+                      <div className="trip-tile-body">
+                        <p className="eyebrow">{t.destination}</p>
+                        <h2>{t.title}</h2>
+                        <p>
+                          <CalendarDays size={14} />
+                          {dateRange(t)}
+                        </p>
+                        <div className="trip-tile-footer">
+                          <div className="avatar-stack">
+                            {t.members.map((m) => (
+                              <Avatar key={m.id} user={m} small />
+                            ))}
+                          </div>
+                          <span>
+                            <strong>{money(t.totals.estimatedCents)}</strong>
+                            <small>trip estimate</small>
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                  <button
+                    className="new-trip-tile"
+                    onClick={() => setModal({ type: "create" })}
+                  >
+                    <span>
+                      <Plus size={25} />
+                    </span>
+                    <h3>Room for one more adventure.</h3>
+                    <p>Create a new trip</p>
+                  </button>
+                </div>
+              ) : (
+                <div
+                  className="welcome-hero"
+                  style={{ "--travel-photo": `url(${themeImages.coast})` }}
+                >
+                  <div>
+                    <Tag>Your plans belong here</Tag>
+                    <h2>
+                      The group chat
+                      <br />
+                      deserves a getaway.
+                    </h2>
+                    <p>
+                      Turn “we should go somewhere” into a trip.
+                      <br />
+                      One shared plan, with every detail in its place.
+                    </p>
+                    <Button onClick={() => setModal({ type: "create" })}>
+                      Plan your first getaway <ArrowUpRight size={18} />
+                    </Button>
+                  </div>
+                  <div className="welcome-stamp">
+                    <Compass size={35} />
+                    <span>
+                      GOOD TIMES
+                      <br />
+                      AHEAD
+                    </span>
+                  </div>
+                </div>
+              )}
+              <div className="home-principles">
+                <div>
+                  <Compass size={23} />
+                  <h3>One plan. Everyone in.</h3>
+                  <p>Bring your stays, food, and adventures together.</p>
+                </div>
+                <div>
+                  <Wallet size={23} />
+                  <h3>No awkward math.</h3>
+                  <p>See the estimate and everyone’s equal share.</p>
+                </div>
+                <div>
+                  <Users size={23} />
+                  <h3>Better, together.</h3>
+                  <p>Invite your people and make the details a group effort.</p>
+                </div>
+              </div>
+            </>
+          ) : tab === "overview" ? (
+            <Overview
+              trip={trip}
+              user={user}
+              onTab={setTab}
+              onAdd={onAdd}
+              onInvite={() => setModal({ type: "invite" })}
+            />
+          ) : tab === "budget" ? (
+            <Budget
+              trip={trip}
+              onUpdate={update}
+              onAdd={onAdd}
+              onEdit={onEdit}
+              notify={notify}
+            />
+          ) : tab === "pool" ? (
+            <Pool
+              trip={trip}
+              user={user}
+              onUpdate={update}
+              onInvite={() => setModal({ type: "invite" })}
+              onContribute={() => setModal({ type: "contribution" })}
+              notify={notify}
+            />
+          ) : tab === "itinerary" ? (
+            <Itinerary trip={trip} onAdd={onAdd} onEdit={onEdit} />
+          ) : (
+            <Explore trip={trip} onAdd={onAdd} />
+          )}
+        </main>
+        <footer className="app-footer">
+          <span>A little less logistics. A little more getaway.</span>
+          <span>DayTripper · Built for going together</span>
+        </footer>
+      </div>
+      {trip && (
+        <button
+          className="assistant-fab"
+          onClick={() => setModal({ type: "assistant" })}
+        >
+          <Sparkles size={19} />
+          <span>Trip copilot</span>
+          <Tag>Demo</Tag>
+        </button>
+      )}
+      {toast && (
+        <div
+          className={"toast " + (toast.isError ? "error" : "")}
+          role={toast.isError ? "alert" : "status"}
+        >
+          {toast.isError ? <X size={18} /> : <Check size={18} />}
+          <span>{toast.text}</span>
+          <button
+            onClick={() => setToast(null)}
+            aria-label="Dismiss notification"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
+      {modal?.type === "create" && (
+        <CreateTrip onClose={() => setModal(null)} onSaved={savedTrip} />
+      )}{" "}
+      {modal?.type === "join" && (
+        <JoinTrip
+          initialCode={joinCode}
+          onClose={() => setModal(null)}
+          onSaved={savedTrip}
+        />
+      )}{" "}
+      {trip && modal?.type === "invite" && (
+        <InviteTrip trip={trip} onClose={() => setModal(null)} />
+      )}{" "}
+      {trip && modal?.type === "item" && (
+        <ItemForm
+          trip={trip}
+          item={modal.item}
+          category={modal.category}
+          onClose={() => setModal(null)}
+          onSaved={savedItem}
+        />
+      )}{" "}
+      {trip && modal?.type === "contribution" && (
+        <ContributionForm
+          trip={trip}
+          onClose={() => setModal(null)}
+          onSaved={savedItem}
+        />
+      )}{" "}
+      {trip && modal?.type === "assistant" && (
+        <Assistant
+          trip={trip}
+          onClose={() => setModal(null)}
+          onSaved={savedItem}
+        />
+      )}
+    </div>
+  );
+}
