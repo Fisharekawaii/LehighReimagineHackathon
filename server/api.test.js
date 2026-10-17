@@ -28,7 +28,10 @@ function fixture() {
     );
     return {
       status: r.status,
-      data: await r.json(),
+      data: r.headers.get("content-type")?.includes("text/calendar")
+        ? await r.text()
+        : await r.json(),
+      headers: Object.fromEntries(r.headers),
       cookie: r.headers.get("set-cookie")?.split(";")[0],
     };
   };
@@ -270,4 +273,54 @@ test("logout removes only the current session", async () => {
   await request("/logout", "POST", {}, a);
   assert.equal((await request("/me", "GET", null, a)).status, 401);
   assert.equal((await request("/me", "GET", null, b)).status, 200);
+});
+
+test("calendar downloads enforce membership, omit payments, and do not mutate trips", async () => {
+  const { request, storage } = fixture();
+  const a = (await request("/demo-login", "POST", { userId: "diego" })).cookie;
+  const b = (await request("/demo-login", "POST", { userId: "alex" })).cookie;
+  const t = (await request("/trips", "POST", tripInput, a)).data;
+  const path = `/trips/${t.id}/calendar/export`;
+  const settings = { timezone: "America/New_York", durationMinutes: 60 };
+  assert.equal((await request(path, "POST", settings)).status, 401);
+  assert.equal((await request(path, "POST", settings, b)).status, 404);
+  assert.equal((await request(path, "POST", settings, a)).status, 400);
+  await request(
+    `/trips/${t.id}/items`,
+    "POST",
+    {
+      title: "Ferry",
+      category: "Transport",
+      price: 45,
+      quantity: 1,
+      date: "2026-10-23",
+      time: "10:00",
+    },
+    a,
+  );
+  await request(
+    `/trips/${t.id}/payments`,
+    "POST",
+    { amount: 45, note: "PRIVATE_PAYMENT_NOTE" },
+    a,
+  );
+  const before = await storage.read();
+  const response = await request(path, "POST", settings, a);
+  assert.equal(response.status, 200);
+  assert.match(response.headers["content-type"], /text\/calendar/);
+  assert.match(
+    response.headers["content-disposition"],
+    /attachment; filename="Weekend-itinerary.ics"/,
+  );
+  assert.match(response.data, /SUMMARY:Ferry/);
+  assert.match(response.data, /DTSTART:20261023T140000Z/);
+  assert.doesNotMatch(response.data, /PRIVATE_PAYMENT_NOTE/);
+  assert.deepEqual(await storage.read(), before);
+  await request("/join", "POST", { code: t.code }, b);
+  assert.equal((await request(path, "POST", settings, b)).status, 200);
+  assert.equal(
+    (await request(path, "POST", { ...settings, timezone: "invalid" }, a))
+      .status,
+    400,
+  );
 });

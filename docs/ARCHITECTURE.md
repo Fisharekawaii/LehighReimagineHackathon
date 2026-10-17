@@ -71,4 +71,12 @@ No generic trip PATCH or mode change exists in this skeleton. No provider integr
 - AUTH-01: shared demo profile switching is not authentication. Real sign-in, expiry policies, account recovery, invite revocation/rate limits, and private membership are later work.
 - DATA-01: normalized persistence, migrations, backups, request idempotency, and per-item conflict handling for production scale.
 - SYNC-01: current data refreshes after writes and when the window gains focus; manual refresh exists. There is no real-time subscription.
-- CAL-01: store a trip timezone before interpreting itinerary clock times as calendar instants. Current times are display-only wall-clock entries.
+- CAL-01 is implemented: the export request explicitly supplies the destination time zone. CAL-03 will persist a shared zone and add per-item end times; current exports use a visible duration assumption.
+
+## Calendar export API
+
+`POST /api/trips/:id/calendar/export` with `{timezone: "America/New_York", durationMinutes: 60}`. Requires membership; returns `text/calendar; charset=utf-8` with an attachment filename, no-store caching and nosniff. Allowed durations: 30, 60, 90, 120 minutes. Errors retain the normal `{error}` JSON shape. Export reads the authoritative trip without mutating it.
+
+`server/integrations/calendar.js` generates RFC 5545 content using CRLF, UTF-8-aware 75-octet folding, escaped TEXT, stable per-item UIDs, UTC timed events and exclusive next-day all-day ends. It uses built-in Intl APIs and has no provider dependency. Destination local times are resolved against the requested IANA zone; spring-forward gaps are rejected and fall-back overlaps use the earlier instant. UI download code lives in `src/features/calendar/CalendarPanel.jsx`.
+
+The exported calendar is a snapshot. It does not connect to calendar accounts, send invitations, subscribe to updates, or change availability. Booking/task confirmation maps to tentative/confirmed event status independently of contribution state. Never include the pool ledger or private payment notes in exports.

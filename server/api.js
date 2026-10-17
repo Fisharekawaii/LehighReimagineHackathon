@@ -9,6 +9,7 @@ import {
   newItem,
 } from "./logic.js";
 import { proposeTripChange } from "./integrations/assistant.js";
+import { exportItinerary } from "./integrations/calendar.js";
 
 // Runtime-independent API. Storage contract is documented in docs/ARCHITECTURE.md.
 export async function handleApi(request, storage) {
@@ -152,7 +153,21 @@ export async function handleApi(request, storage) {
         } else if (t) {
           const sub = match[2] || "";
           if (!sub && method === "GET") result = view(t);
-          else if (sub === "items" && method === "POST") {
+          else if (sub === "calendar/export" && method === "POST") {
+            const exported = await exportItinerary({
+              trip: t,
+              timezone: body.timezone,
+              durationMinutes: body.durationMinutes ?? 60,
+            });
+            return new Response(exported.content, {
+              headers: {
+                "Content-Type": "text/calendar; charset=utf-8",
+                "Content-Disposition": `attachment; filename="${exported.filename}"`,
+                "Cache-Control": "no-store",
+                "X-Content-Type-Options": "nosniff",
+              },
+            });
+          } else if (sub === "items" && method === "POST") {
             if (t.items.length >= 300)
               fail("This trip has reached its item limit.");
             t.items.push(newItem(body, t));

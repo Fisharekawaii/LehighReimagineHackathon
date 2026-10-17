@@ -132,7 +132,7 @@ export default function Itinerary({ trip, onAdd, onEdit }) {
               </p>
             </div>
           </div>
-          <CalendarPanel />
+          <CalendarPanel key={trip.id} trip={trip} />
         </aside>
       </div>
     </>

@@ -2915,3 +2915,48 @@ details > summary {
     justify-content: center;
   }
 }
+
+.calendar-panel .form-stack {
+  margin-top: 20px;
+  gap: 16px;
+}
+.calendar-panel .btn {
+  white-space: normal;
+  width: 100%;
+}
+.calendar-panel .field select {
+  font-size: 12px;
+}
+.calendar-panel .field small {
+  font-size: 10px;
+}
+.calendar-success {
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+  color: #527b45 !important;
+  font-size: 11px !important;
+}
+.calendar-success svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.calendar-help {
+  margin-top: 14px;
+}
+.calendar-help p {
+  padding-top: 10px;
+}
+.calendar-future {
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+  padding-top: 16px;
+}
+.calendar-future p {
+  margin-top: 9px;
+}
+@media (max-width: 720px) {
+  .calendar-panel .field select {
+    font-size: 16px;
+  }
+}

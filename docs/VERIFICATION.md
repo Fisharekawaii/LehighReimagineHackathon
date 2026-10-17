@@ -23,3 +23,9 @@ Tests use local preview data only; the deployed store is not prefilled from this
 ## Limits
 
 No live external provider, real authentication, payment processing, real card, or real-time collaboration has been validated or claimed. The mobile home, navigation drawer, and budget screen were visually checked at a 390px iframe viewport; content stays within the viewport and the category strip scrolls horizontally. This is not testing on physical iPhone hardware. Test your chosen providers and target devices as they are connected.
+
+## Calendar export checks
+
+The suite now has 12 passing tests. New checks cover member-only access and unchanged saved state, omission of payment data, UTC conversion in summer/winter and fractional-offset zones, DST gaps/overlaps, chosen durations, all-day year boundaries, skipping unscheduled items, invalid options, Unicode line folding and property-injection escaping. The React production build passes. Real import behavior in Google/Apple/Outlook and physical iPhone download handling have not been tested.
+
+Browser UI check: the itinerary panel and export settings render, and clicking download reaches the prepared-file confirmation. The automation download-event wait timed out; independent saved-file completion was not observed. API response and calendar content are verified by the tests above.

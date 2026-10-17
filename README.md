@@ -36,14 +36,20 @@ npm test
 
 ## What works
 
-Demo profiles; create and join trips by link/code; saved trips; categorized budget CRUD; exact-cent equal splits; booking/task confirmations; dated itinerary; external contributions submitted by members and confirmed/rejected by the organizer; simulated shared card; responsive layout.
+Demo profiles; create and join trips by link/code; saved trips; categorized budget CRUD; exact-cent equal splits; booking/task confirmations; dated itinerary and .ics calendar export; external contributions submitted by members and confirmed/rejected by the organizer; simulated shared card; responsive layout.
 
 ## What is a shell
 
-Real authentication; AI provider; live nearby recommendations and prices; maps/routes; calendar export/import; booking APIs. The assistant has a clearly labeled deterministic demo command parser with preview/apply. Booking and discovery links open external websites; they do not import prices or make bookings.
+Real authentication; AI provider; live nearby recommendations and prices; maps/routes; availability import/automatic calendar sync; booking APIs. The assistant has a clearly labeled deterministic demo command parser with preview/apply. Booking and discovery links open external websites; they do not import prices or make bookings.
 
 **No real cards or money movement.** Demo identities are shared by everyone who can access the app. Use sample data, not private information. The organizer permission is enforced by the API for the selected profile, but choosing demo profiles is intentionally not secure identity verification.
 
 ## Optional private review deployment
 
 A separate Sites adapter hosts the same React UI and API on a Worker with D1 persistence; it does not replace the Node/Express team setup. `hosting/` records the adapter source and synchronization steps. Local Node data, local preview data, and hosted data are separate. The hosted preview starts empty; the UI does not require a fixed Nantucket scenario.
+
+## Export an itinerary to a calendar
+
+Open **Itinerary & map**, select the **destination time zone**, choose the duration for timed events, then click **Download itinerary (.ics)**. Open/import the file in your calendar app. Only items with a date are included; items with no time become all-day events. The time-zone selector starts with the device zone, so check it when planning a trip elsewhere.
+
+This is a one-time snapshot, not account sync. Later changes require another export; some calendar apps may duplicate events on repeated imports. No calendar account or API key is needed.
