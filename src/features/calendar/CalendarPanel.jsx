@@ -159,14 +159,7 @@ export default function CalendarPanel({ trip, onUpdate }) {
         </p>
       </details>
       <CalendarImport trip={trip} onUpdate={onUpdate} timezone={timezone} />
-      <div className="calendar-future">
-        <Tag>Still planned</Tag>
-        <p>
-          Shared availability matching and automatic calendar syncing are still
-          planned.
-        </p>
-      </div>
-      {/* TODO(CAL-02): Add availability import here. TODO(CAL-03): Shared zone and per-item end times. */}
+      {/* Calendar scope: manual ICS import/export only; no account sync. */}
     </div>
   );
 }
