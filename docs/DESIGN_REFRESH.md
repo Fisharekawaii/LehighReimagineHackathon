@@ -18,3 +18,6 @@ Added staggered getaway/category/discovery entrances, scenic hero reveals, modal
 
 ## Expressive motion follow-up
 Added bounded mouse-following 3D tilt to getaway and contribution cards, a moving light reflection, a single shimmer on getaway hover, a brief scenic zoom/crossfade when a theme changes, and a small particle burst on successful notification. Plus tiles, discovery filters and navigation icons get additional hover feedback. Pointer feedback skips touch and reduced-motion users; decorative layers ignore input. No autoplay loops or changes to financial functionality. Production build passes.
+
+## Tactile cards, without spotlight
+Removed the credit-card cursor-following white reflection at user request; retained its bounded tilt and softened the return easing. Added mouse-following tilt to budget category and discovery cards. Touch and reduced-motion behavior remains steady. Decorative entrance animations release their transform after completing so pointer feedback can take over.

@@ -1,3 +1,4 @@
+import { tiltCard, resetTilt } from "../../lib/motion";
 import React, {useState, useRef} from 'react';
 import {Compass, MapPin, ArrowUpRight, Trees, Landmark, Palette, Plus} from 'lucide-react';
 import {SectionHeading, Button, Field, ErrorMessage} from '../../components/UI';
@@ -44,7 +45,7 @@ export default function Explore({trip,onAdd,onDraft}) {
     {result ? <section aria-live="polite">
       <div className="discovery-results-head"><div><h2>Near {area.title}</h2><p>{scheduledCount} planned {scheduledCount===1?'stop':'stops'} on {date}. Review hours and access before heading out.</p></div><span className="discovery-count">{result.places.length} finds</span></div>
       <div className="discovery-tabs" aria-label="Filter discoveries">{['All',...Object.keys(icons)].map(k=><button key={k} aria-pressed={filter===k} onClick={()=>setFilter(k)}>{k}</button>)}</div>
-      {places.length ? <div className="discovery-grid">{places.map((p,i)=>{const Icon=icons[p.kind]||MapPin;return <article className={'discovery-card discovery-'+p.kind.split(' ')[0].toLowerCase()} key={p.id}>
+      {places.length ? <div className="discovery-grid">{places.map((p,i)=>{const Icon=icons[p.kind]||MapPin;return <article onPointerMove={tiltCard} onPointerLeave={resetTilt} onPointerCancel={resetTilt} className={'discovery-card discovery-'+p.kind.split(' ')[0].toLowerCase()} key={p.id}>
         <div className="discovery-card-top"><span><Icon size={23}/></span><small>{String(i+1).padStart(2,'0')} / {p.kind}</small></div>
         <h3>{p.title}</h3><p className="discovery-description">{p.description}</p><span className="discovery-distance"><MapPin size={14}/>{p.distanceKm.toFixed(1)} km away · straight line</span>
         <div className="discovery-reasons">{p.reasons.map(r=><span key={r}>{r}</span>)}</div><p className="fine-print">Price & opening hours: check with the venue.</p>

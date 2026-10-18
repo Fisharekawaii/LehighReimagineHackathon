@@ -1,3 +1,4 @@
+import { tiltCard, resetTilt } from "../../lib/motion";
 import React, { useState } from "react";
 import {
   Plus,
@@ -277,6 +278,7 @@ export function Budget({ trip, onUpdate, onAdd, onEdit, notify }) {
           return (
             <button
               className={"category-card " + (filter === name ? "active" : "")}
+              onPointerMove={tiltCard} onPointerLeave={resetTilt} onPointerCancel={resetTilt}
               onClick={() => setFilter(filter === name ? "All" : name)}
               key={name}
             >
