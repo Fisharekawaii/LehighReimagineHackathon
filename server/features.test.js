@@ -95,3 +95,17 @@ test('editing a confirmed plan preserves confirmation; changing its address clea
  const outsider=await f.call('/auth/register','POST',{name:'Other',username:'other',password:'sample-password'});
  assert.equal((await f.call(`/trips/${t.id}/discovery/search`,'POST',{},outsider.cookie)).status,404);
 });
+test('only the organizer can delete a trip, removing access and its invite while preserving other trips',async()=>{
+ const f=fixture(),a=await f.call('/auth/register','POST',{name:'Owner',username:'owner',password:'sample-password'}),b=await f.call('/auth/register','POST',{name:'Friend',username:'friend',password:'sample-password'}),c=await f.call('/auth/register','POST',{name:'Other',username:'other',password:'sample-password'});
+ const t=(await f.call('/trips','POST',input,a.cookie)).data,other=(await f.call('/trips','POST',{...input,title:'Keep this trip'},a.cookie)).data;
+ await f.call('/join','POST',{code:t.code},b.cookie);
+ assert.equal((await f.call(`/trips/${t.id}`,'DELETE',{},b.cookie)).status,403);
+ await f.call(`/trips/${t.id}/members/${b.data.id}`,'PATCH',{role:'editor'},a.cookie);
+ assert.equal((await f.call(`/trips/${t.id}`,'DELETE',{},b.cookie)).status,403);
+ assert.equal((await f.call(`/trips/${t.id}`,'DELETE',{},c.cookie)).status,404);
+ assert.equal((await f.call(`/trips/${t.id}`,'DELETE',{},a.cookie)).status,200);
+ assert.equal((await f.call(`/trips/${t.id}`,'GET',null,b.cookie)).status,404);
+ assert.equal((await f.call('/join','POST',{code:t.code},b.cookie)).status,404);
+ assert.deepEqual((await f.call('/trips','GET',null,a.cookie)).data.map(t=>t.id),[other.id]);
+ assert.equal((await f.storage.read()).state.trips.some(trip=>trip.id===t.id),false);
+});

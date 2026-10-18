@@ -3281,3 +3281,10 @@ button:disabled {
 .trip-nav-ready button{animation:trip-nav-arrive .55s both;animation-delay:calc(var(--nav-order,0)*45ms)}
 @keyframes trip-nav-arrive{from{opacity:.35;transform:translateX(-9px)}to{opacity:1;transform:translateX(0)}}
 @media(prefers-reduced-motion:reduce){.trip-nav-ready button{animation:none}}
+
+/* Separate sibling controls keep a getaway card and its delete action accessible. */
+.trip-tile-wrap{position:relative;min-width:0;display:flex}.trip-tile-wrap>.trip-tile{width:100%;height:100%}
+.trip-delete-button{position:absolute;top:15px;right:15px;z-index:2;display:flex;align-items:center;gap:6px;padding:8px 11px;border:1px solid #ffffff80;border-radius:20px;background:#fffef9ed;color:#804c40;font:inherit;font-size:11px;cursor:pointer;box-shadow:0 2px 10px #00000010;transition:background .2s,transform .2s}
+.trip-delete-button:hover{background:#fff;transform:translateY(-1px)}.trip-delete-button:focus-visible{outline:3px solid #b56e48;outline-offset:3px}.trip-tile-wrap .trip-tile-image>span:last-child{visibility:hidden}
+.delete-trip-actions{display:flex;justify-content:flex-end;gap:12px}.btn.danger-button{background:#963f35;border-color:#963f35;color:white}.btn.danger-button:hover{background:#7d332b}
+@media(prefers-reduced-motion:reduce){.trip-delete-button{transition:none}.trip-delete-button:hover{transform:none}}

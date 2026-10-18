@@ -46,3 +46,9 @@ Suggested 3-minute demo: 0:00–0:25 fragmented group-trip problem; 0:25–0:55 
 Node live-provider checks returned actual nearby places for New York and Shawnee on Delaware. The local hosted Worker preview returned an internal runtime error for external lookups; the UI success path was tested using a temporary captured live response, with fallback/error behavior separately verified. Test fixtures and demo-mode flags are removed before publication. Hosted external requests must not be claimed end-to-end verified without a successful hosted check.
 
 Browser walkthrough: desktop and 390px mobile layouts inspected; sidebar activation/navigation checked; captured-live Discovery result → editable draft → saved item/pin exercised; confirmation label verified after save; arrow-key map selection and rapid navigation away retested after fixing Leaflet cleanup/CSS zoom timer crashes; contribution method/purpose, pending state and organizer receipt tested; simulated card measured at 1.586 aspect ratio. Backend tests exercise separate real-account sessions and viewer/editor authorization. Browser QA uses disposable local demo data, not production accounts.
+
+## Trip deletion — October 17, 2026
+
+The My getaways screen now includes a separate Delete control on cards owned by the organizer. A confirmation dialog names the trip and explains that deleting it permanently removes plans, itinerary, invitations and contribution records for all members; external payments are unaffected. Keep trip cancels. DELETE /api/trips/:id enforces organizer ownership, persists removal atomically and invalidates member access/invite codes. Other trips remain intact. 25 automated tests and the Vite production build pass, including viewer/editor/nonmember rejection and deleted-trip isolation.
+
+Sharing checked: the GitHub repository is public; the hosted app has custom access with Diego Cano as its only allowed owner. This change preserves that access policy.

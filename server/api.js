@@ -231,7 +231,12 @@ export async function handleApi(request, storage, options = {}) {
               403,
             );
           if (!sub && method === "GET") result = view(t);
-          else if (sub === "invites" && method === "POST") {
+          else if (!sub && method === "DELETE") {
+            owner();
+            db.trips = db.trips.filter(trip => trip.id !== t.id);
+            changed = true;
+            result = {ok: true, id: t.id};
+          } else if (sub === "invites" && method === "POST") {
             owner();
             if (!["viewer", "editor"].includes(body.role))
               fail("Choose viewer or editor.");

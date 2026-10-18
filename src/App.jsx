@@ -20,6 +20,7 @@ import {
   Sun,
   Briefcase,
   CalendarDays,
+  Trash2,
 } from "lucide-react";
 import AuthForm from "./features/auth/AuthForm";
 import { api } from "./lib/api";
@@ -31,6 +32,7 @@ import {
   Tag,
   Empty,
   ErrorMessage,
+  Modal,
 } from "./components/UI";
 import { CreateTrip, JoinTrip, InviteTrip } from "./features/trips/TripForms";
 import Overview from "./features/trips/Overview";
@@ -60,7 +62,8 @@ export default function App() {
     [toast, setToast] = useState(null),
     [mobile, setMobile] = useState(false),
     [joinCode, setJoinCode] = useState(""),
-    [syncError,setSyncError] = useState(false);
+    [syncError,setSyncError] = useState(false),
+    [deleteError,setDeleteError] = useState("");
   const trip = trips.find((t) => t.id === tripId);
   const notify = useCallback(
     (text, isError = false) => setToast({ text, isError }),
@@ -431,6 +434,7 @@ export default function App() {
               {trips.length ? (
                 <div className="trip-grid">
                   {trips.map((t) => (
+                    <div className="trip-tile-wrap" key={t.id}>
                     <button
                       className={"trip-tile " + t.theme}
                       key={t.id}
@@ -472,6 +476,8 @@ export default function App() {
                         </div>
                       </div>
                     </button>
+                    {t.role === "organizer" && <button className="trip-delete-button" aria-label={"Delete trip " + t.title} title="Delete trip" onClick={() => {setDeleteError("");setModal({type:"delete-trip",trip:t});}}><Trash2 size={16}/><span>Delete</span></button>}
+                    </div>
                   ))}
                   <button
                     className="new-trip-tile"
@@ -636,6 +642,28 @@ export default function App() {
           onSaved={savedItem}
         />
       )}{" "}
+      {modal?.type === "delete-trip" && (
+        <Modal title="Delete this getaway?" subtitle={modal.trip.title} onClose={() => !busy && setModal(null)}>
+          <div className="form-stack">
+            <p>This permanently deletes the trip for everyone, including its plans, itinerary, invitations and contribution records. Payments made outside DayTripper are unaffected.</p>
+            <ErrorMessage error={deleteError}/>
+            <div className="delete-trip-actions">
+              <Button variant="secondary" disabled={busy} onClick={() => setModal(null)}>Keep trip</Button>
+              <Button className="danger-button" busy={busy} onClick={async () => {
+                setBusy(true);setDeleteError("");
+                try {
+                  const id=modal.trip.id;
+                  await api(`/trips/${id}`,"DELETE");
+                  setTrips(prev => prev.filter(t => t.id !== id));
+                  if(tripId === id)setTripId(null);
+                  setModal(null);notify("Trip deleted.");
+                  await loadTrips();
+                } catch(e){setDeleteError(e.message);} finally {setBusy(false);}
+              }}><Trash2 size={16}/>Delete trip</Button>
+            </div>
+          </div>
+        </Modal>
+      )}
       {trip && modal?.type === "assistant" && (
         <Assistant
           trip={trip}
