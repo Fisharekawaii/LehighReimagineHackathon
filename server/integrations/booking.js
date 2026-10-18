@@ -8,6 +8,9 @@ const providers = [
   "booking.com",
   "vrbo.com",
   "hotels.com",
+  "uber.com", "lyft.com", "amtrak.com",
+  "ubereats.com", "doordash.com", "opentable.com",
+  "viator.com", "getyourguide.com", "eventbrite.com",
 ];
 function allowed(value) {
   let url;
@@ -93,13 +96,21 @@ export function extractBooking(html, url) {
     priceType: "estimated",
   };
 }
-export async function bookingDraft(value, fetcher = fetch) {
+export async function bookingDraft(value, fetcher = fetch, category = "Stays") {
+  if (!["Stays", "Transport", "Food & drinks", "Experiences", "Other"].includes(category)) fail("Choose a valid category.");
+  // Unknown HTTPS sites are retained as references without a server-side fetch.
+  let reference;
+  try { reference = new URL(value); } catch { fail("Paste a valid HTTPS link."); }
+  if (reference.protocol !== "https:" || reference.username || reference.password || reference.port) fail("Use an HTTPS link without credentials or a custom port.");
+  if (!providers.some(h => reference.hostname === h || reference.hostname.endsWith("." + h))) {
+    return {draft:{title:"",url:reference.href,category,quantity:1,price:"",notes:""},warning:"This site does not support autofill. Your link is saved; enter the details manually."};
+  }
   let url = allowed(value);
   const original = url.href;
   const fallback = {
     title: "",
     url: original,
-    category: "Stays",
+    category,
     quantity: 1,
     price: "",
     notes: "",
@@ -137,7 +148,7 @@ export async function bookingDraft(value, fetcher = fetch) {
       if(!response.ok||!response.headers.get("content-type")?.includes("text/html"))throw new Error();
       html=await readHtml(response);
     }
-    const draft = extractBooking(html, original);
+    const draft = {...extractBooking(html, original), category};
     // Only explicit URL dates are used; availability and totals cannot be inferred.
     const date =
       url.searchParams.get("check_in") || url.searchParams.get("startDate");

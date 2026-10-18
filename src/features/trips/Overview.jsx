@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import VibeGallery from "./VibeGallery";
 import {
   ArrowUpRight,
   Plus,
@@ -26,6 +27,14 @@ export default function Overview({
   onUpdate,
   notify,
 }) {
+  const [savingTheme, setSavingTheme] = useState(false);
+  async function changeTheme(theme) {
+    if (savingTheme || !trip.canEdit || theme === trip.theme) return;
+    setSavingTheme(true);
+    try { onUpdate(await api(`/trips/${trip.id}/theme`, "PATCH", {theme})); }
+    catch (e) { notify(e.message, true); }
+    finally { setSavingTheme(false); }
+  }
   const ready = trip.items.filter((i) => i.status === "verified").length,
     share = trip.totals.shares.find((s) => s.userId === user.id),
     pool = trip.mode === "pool";
@@ -72,35 +81,10 @@ export default function Overview({
           </button>
         </div>
       </div>
-      <div className="vibe-toolbar">
-
-        <label>
-          Trip vibe{" "}
-          <select
-            aria-label="Trip vibe"
-            value={trip.theme}
-            disabled={!trip.canEdit}
-            onChange={async (e) => {
-              try {
-                onUpdate(
-                  await api(`/trips/${trip.id}/theme`, "PATCH", {
-                    theme: e.target.value,
-                  }),
-                );
-              } catch (e) {
-                notify(e.message, true);
-              }
-            }}
-          >
-            {Object.entries(vibes).map(([k, v]) => (
-              <option key={k} value={k}>
-                {v.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <Tag>{trip.role}</Tag>
-      </div>
+      <section className="trip-theme-picker" aria-label="Trip theme" aria-busy={savingTheme}>
+        <div className="theme-picker-heading"><h2>Trip theme</h2><span role="status">{savingTheme ? "Saving…" : trip.canEdit ? "Select a card to change your theme" : "Only editors can change the theme"}</span></div>
+        <VibeGallery value={trip.theme} onChange={changeTheme} disabled={!trip.canEdit || savingTheme}/>
+      </section>
       <div className="stats-grid">
         <div className="stat">
           <span>

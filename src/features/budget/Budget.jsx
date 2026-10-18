@@ -30,6 +30,13 @@ export const categoryMeta = [
   { name: "Experiences", icon: Ticket, color: "sage" },
   { name: "Other", icon: Package, color: "lilac" },
 ];
+const linkExamples = {
+  Stays: {label: "Accommodation link", example: "https://www.airbnb.com/rooms/…", hint: "Airbnb, Booking.com, Expedia, Vrbo, or Hotels.com", title: "A cottage by the water"},
+  Transport: {label: "Transportation link", example: "https://www.uber.com/…", hint: "Uber, Lyft, Amtrak, or Expedia", title: "Uber from the airport"},
+  "Food & drinks": {label: "Food or restaurant link", example: "https://www.ubereats.com/store/…", hint: "Uber Eats, DoorDash, or OpenTable", title: "Dinner delivery from DoorDash"},
+  Experiences: {label: "Activity or ticket link", example: "https://www.viator.com/tours/…", hint: "Viator, GetYourGuide, or Eventbrite", title: "Kayaking tour"},
+  Other: {label: "Reference link", example: "https://…", hint: "Save any HTTPS link; unsupported sites use manual entry.", title: "Supplies for the weekend"},
+};
 export function ItemForm({
   trip,
   item: existing,
@@ -41,6 +48,8 @@ export function ItemForm({
   const [draft, setDraft] = useState(initialDraft || null),
     [draftMessage, setDraftMessage] = useState("");
   const item = existing || draft;
+  const [selectedCategory, setSelectedCategory] = useState(item?.category || category);
+  const linkExample = linkExamples[selectedCategory] || linkExamples.Other;
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   return (
@@ -60,7 +69,7 @@ export function ItemForm({
               const data = await api(
                 `/trips/${trip.id}/booking/draft`,
                 "POST",
-                formData(e),
+                {...formData(e), category: selectedCategory},
               );
               setDraft(data.draft);
               setDraftMessage(data.warning);
@@ -71,12 +80,12 @@ export function ItemForm({
             }
           }}
         >
-          <Field label="Paste a booking link">
+          <Field label={linkExample.label} hint={linkExample.hint}>
             <input
               name="url"
               type="url"
               required
-              placeholder="https://www.airbnb.com/rooms/…"
+              placeholder={linkExample.example}
             />
           </Field>
           <Button variant="secondary" type="submit" busy={busy}>
@@ -113,13 +122,13 @@ export function ItemForm({
             required
             maxLength={100}
             defaultValue={item?.title}
-            placeholder="A cottage by the water"
+            placeholder={linkExample.title}
             autoFocus
           />
         </Field>
         <div className="form-row">
           <Field label="Category">
-            <select name="category" defaultValue={item?.category || category}>
+            <select name="category" value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
               {categoryMeta.map((c) => (
                 <option key={c.name}>{c.name}</option>
               ))}

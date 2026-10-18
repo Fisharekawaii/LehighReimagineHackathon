@@ -49,7 +49,7 @@ test('booking metadata is a draft, explicit USD only and blocked fetches fall ba
  assert.equal(extractBooking(html.replace('USD','EUR'),'https://www.airbnb.com/rooms/1').price,'');
  assert.equal(extractBooking(html,'x').title,'A cottage & garden');
  await assert.rejects(()=>bookingDraft('http://localhost:3001'));
- await assert.rejects(()=>bookingDraft('https://airbnb.com.evil.test/'));
+ const unknown=await bookingDraft('https://airbnb.com.evil.test/',()=>{throw new Error('Must not fetch unknown hosts');});assert.equal(unknown.draft.title,'');assert.match(unknown.warning,/does not support autofill/);
  const fallback=await bookingDraft('https://www.expedia.com/test',async()=>new Response('',{status:403}));assert.equal(fallback.draft.price,'');assert.match(fallback.warning,/manually/);
 });
 test('travel estimates are finite for nearby, identical and long distance pins',()=>{
@@ -108,4 +108,15 @@ test('only the organizer can delete a trip, removing access and its invite while
  assert.equal((await f.call('/join','POST',{code:t.code},b.cookie)).status,404);
  assert.deepEqual((await f.call('/trips','GET',null,a.cookie)).data.map(t=>t.id),[other.id]);
  assert.equal((await f.storage.read()).state.trips.some(trip=>trip.id===t.id),false);
+});
+
+test('category links retain transport and food categories with manual fallbacks',async()=>{
+ for(const [url,category] of [['https://www.uber.com/ride','Transport'],['https://www.lyft.com/ride','Transport'],['https://www.ubereats.com/store/example','Food & drinks'],['https://www.doordash.com/store/example','Food & drinks']]){
+  let fetched=false;
+  const result=await bookingDraft(url,async()=>{fetched=true;return new Response('<title>Example provider</title>',{headers:{'content-type':'text/html'}});},category);
+  assert.ok(fetched);assert.equal(result.draft.category,category);assert.equal(result.draft.url,url);assert.equal(result.draft.price,'');
+  const blocked=await bookingDraft(url,async()=>new Response('',{status:403}),category);assert.equal(blocked.draft.category,category);assert.equal(blocked.draft.url,url);
+ }
+ let fetched=false;const unknown=await bookingDraft('https://example.com/activity',()=>{fetched=true;},'Experiences');assert.equal(fetched,false);assert.equal(unknown.draft.category,'Experiences');
+ await assert.rejects(()=>bookingDraft('https://www.uber.com/',fetch,'Invalid'));
 });

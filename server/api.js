@@ -286,7 +286,7 @@ export async function handleApi(request, storage, options = {}) {
           } else if (sub === "places/search" && method === "POST") {
             result = await searchPlaces(body.query);
           } else if (sub === "booking/draft" && method === "POST") {
-            result = await bookingDraft(body.url);
+            result = await bookingDraft(body.url, fetch, body.category || "Stays");
           } else if (sub === "calendar/preview" && method === "POST") {
             result = previewCalendar(body.content, body.timezone, t);
           } else if (sub === "calendar/import" && method === "POST") {

@@ -47,7 +47,7 @@ const tabs = [
   ["budget", "Plan & budget", Wallet],
   ["itinerary", "Itinerary & map", Map],
   ["explore", "Explore", Compass],
-  ["pool", "Group & pool", Users],
+  ["pool", "Contributions", Users],
 ];
 export default function App() {
   const [user, setUser] = useState(null),

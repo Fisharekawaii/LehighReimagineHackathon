@@ -144,7 +144,7 @@ export function Pool({ trip, user, onUpdate, onInvite, onContribute, notify }) {
   return (
     <>
       <SectionHeading
-        title={isPool ? "Group & pool" : "Your group"}
+        title={isPool ? "Contributions" : "Your group"}
         description={
           isPool
             ? `${firstName(owner)} collects contributions outside the app and confirms them here.`

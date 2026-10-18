@@ -3338,3 +3338,38 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{ou
 @media(max-width:900px){.stat{padding:20px}.stats-grid{gap:0}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid #dcdfd2}.trip-hero{min-height:330px;padding:28px}}
 @media(max-width:600px){.main-content{padding-top:24px}.home-heading{gap:20px}.home-heading h1{font-size:40px}.trip-grid{gap:20px}.trip-tile-image{height:235px}.trip-tile-body{padding:22px}.trip-hero{padding:24px;min-height:340px}.trip-hero h1{font-size:42px}.hero-details{gap:12px}.stat{padding:17px 13px}.stat strong{font-size:29px}.stat small{line-height:1.5}.discovery-hero{min-height:240px;padding:26px}.plan-category{padding:18px 0}.plan-category:hover{padding-left:0}.sidebar .workspace-switch{margin-top:26px}.new-trip-tile{min-height:180px}.topbar{min-height:64px}}
 @media(prefers-reduced-motion:reduce){.main-content{animation:none}.btn,.trip-tile-image::before,.plan-category,.new-trip-tile,.sidebar nav button{transition:none}.btn:hover:not(:disabled),.sidebar nav button:hover:not(:disabled),.trip-tile:hover .trip-tile-image::before{transform:none}}
+
+/* Theme selection stays available after creation. Color properties interpolate
+   across the whole workspace; reduced motion switches them immediately. */
+@property --trip-paper { syntax:'<color>'; inherits:true; initial-value:#f7f8f4; }
+@property --trip-glow { syntax:'<color>'; inherits:true; initial-value:#dfece8; }
+@property --trip-warmth { syntax:'<color>'; inherits:true; initial-value:#f2e9da; }
+.app-shell{transition:--trip-paper .8s ease,--trip-glow .8s ease,--trip-warmth .8s ease}
+.vibe-coast{--trip-paper:#eef6f4;--trip-glow:#c4e1df;--trip-warmth:#f1e3cb}
+.vibe-forest{--trip-paper:#eef3e7;--trip-glow:#ccdcb9;--trip-warmth:#e9ddc4}
+.vibe-mountain{--trip-paper:#edf2f8;--trip-glow:#ccdaeb;--trip-warmth:#dce1e6}
+.vibe-city{--trip-paper:#f1edf5;--trip-glow:#dbd0e8;--trip-warmth:#eddacb}
+.vibe-lake{--trip-paper:#eaf5f2;--trip-glow:#b9ded7;--trip-warmth:#dce8c9}
+.vibe-desert{--trip-paper:#fcf0e4;--trip-glow:#edd1ae;--trip-warmth:#edc7b5}
+.vibe-countryside{--trip-paper:#f4f3df;--trip-glow:#dedfb2;--trip-warmth:#edd7b6}
+.trip-theme-picker{margin:26px 0 30px;padding:22px 24px 12px;border:1px solid #ffffffa0;border-radius:12px;background:#fffdf65c;overflow:hidden}
+.theme-picker-heading{display:flex;justify-content:space-between;gap:12px;align-items:center}.theme-picker-heading h2{font:400 25px Georgia,serif;margin:0}.theme-picker-heading>span{font-size:12px;color:#596b5b}
+.trip-theme-picker .vibe-stage{height:244px;perspective:1100px}.trip-theme-picker .vibe-postcard{width:160px;height:205px;left:calc(50% - 80px);top:12px}
+.vibe-postcard{transform:translateX(calc(var(--offset)*103px)) translateY(calc(var(--depth)*10px)) translateZ(calc(var(--depth)*-75px)) rotateY(calc(var(--offset)*-19deg)) rotateZ(calc(var(--offset)*5deg));transition:transform .7s cubic-bezier(.22,.8,.25,1),filter .5s,border-color .3s,box-shadow .3s;will-change:transform}
+.vibe-postcard.chosen{box-shadow:0 16px 30px #1d3b3438;border-color:#f2d3a3}.vibe-postcard:focus-visible{outline:3px solid #aa7949;outline-offset:4px}.vibe-selected{position:absolute;top:10px;right:10px;background:#fffbed;color:#264d3c;border-radius:50%;padding:4px;box-sizing:content-box}
+.vibe-controls p{min-width:180px;font-size:12px;color:var(--forest)}.vibe-controls p span{display:block;font-size:10px;letter-spacing:2px;margin-top:5px;color:#6b786b}
+.vibe-controls .icon-btn{border:1px solid #a7b6a2;border-radius:50%;transition:transform .2s,background .2s}.vibe-controls .icon-btn:hover:not(:disabled){background:#fffdf8;transform:scale(1.12)}
+@media(max-width:600px){.trip-theme-picker{padding:18px 8px 10px}.theme-picker-heading{padding:0 10px;align-items:flex-start;flex-direction:column;gap:7px}.trip-theme-picker .vibe-stage{height:225px}.trip-theme-picker .vibe-postcard{width:144px;height:185px;left:calc(50% - 72px)}}
+@media(prefers-reduced-motion:reduce){.app-shell,.vibe-postcard,.vibe-controls .icon-btn{transition:none}.vibe-controls .icon-btn:hover:not(:disabled){transform:none}}
+/* Sidebar follows the selected scenery while preserving readable contrast. */
+.app-shell{--trip-sidebar:#203e35;--trip-nav:#ede9da}
+.vibe-coast{--trip-sidebar:#204b4d;--trip-nav:#dceee8}
+.vibe-forest{--trip-sidebar:#2b422c;--trip-nav:#e1e8ce}
+.vibe-mountain{--trip-sidebar:#293e55;--trip-nav:#e0e8f1}
+.vibe-city{--trip-sidebar:#40334d;--trip-nav:#eae0ef}
+.vibe-lake{--trip-sidebar:#214a44;--trip-nav:#d8eee5}
+.vibe-desert{--trip-sidebar:#603e30;--trip-nav:#f2dfc5}
+.vibe-countryside{--trip-sidebar:#454a2b;--trip-nav:#eee9ca}
+.app-shell .sidebar{background:var(--trip-sidebar);transition:background-color .8s ease}
+.app-shell .sidebar nav button.active{background:var(--trip-nav);color:var(--trip-sidebar)}
+@media(prefers-reduced-motion:reduce){.app-shell .sidebar{transition:none}}
