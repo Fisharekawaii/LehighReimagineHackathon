@@ -27,3 +27,6 @@ Fixed false "blocked preview" reporting when a page has no title. Metadata extra
 
 ## Calendar scope confirmed
 Calendars remain manual ICS import/export only. Removed the Still planned availability-matching/automatic-sync notice and stale CAL-02 TODO from CalendarPanel. Account linking and automatic synchronization are not planned scope. Existing event import/export behavior remains unchanged; no claim of group free/busy matching is made.
+
+## Planning-only group budget
+Replaced the planning-only group illustration with a real budget summary: total estimated plan cost, crew count, equal per-person estimate, and a total of all crew shares. Uses existing server integer-cent shares so remainder cents reconcile exactly; uneven splits show the one-cent range and an explanation. Each member retains their individual share. Updates follow existing shared trip refresh on edits/joins. Planning-mode viewers no longer say can contribute. Applies only to planning-only mode; no payment recording or card-mode behavior changes.

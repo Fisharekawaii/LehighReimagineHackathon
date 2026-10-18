@@ -194,19 +194,21 @@ export function Pool({ trip, user, onUpdate, onInvite, onContribute, notify }) {
               </p>
             </>
           ) : (
-            <div className="planning-card">
-              <ClipboardCheck size={35} />
-              <Tag>Planning only</Tag>
-              <h2>
-                A shared plan.
-                <br />
-                Your own payments.
-              </h2>
-              <p>
-                Check off bookings in Plan & Budget. Your group can see what's
-                ready and what still needs a little attention.
-              </p>
-            </div>
+            <section className="planning-share-summary" aria-label="Planning-only budget split">
+              <div className="panel-heading"><h2>Group budget</h2><Tag>Planning only</Tag></div>
+              <p className="muted">Total estimated cost of everything in your plan.</p>
+              <strong className="planning-total">{money(trip.totals.estimatedCents)}</strong>
+              <div className="planning-split-equation">
+                <span>Split equally between</span>
+                <strong>{trip.members.length} {trip.members.length === 1 ? "traveler" : "travelers"}</strong>
+              </div>
+              <div className="planning-share-amount">
+                <span>Estimated per person</span>
+                <strong>{money(Math.floor(trip.totals.estimatedCents / Math.max(1, trip.members.length)))}{trip.totals.estimatedCents % Math.max(1, trip.members.length) !== 0 && <>–{money(trip.totals.perPersonCents)}</>}</strong>
+              </div>
+              <p className="fine-print">Shares update when you change the plan or someone joins. Each traveler pays independently.</p>
+              {trip.totals.estimatedCents % Math.max(1, trip.members.length) !== 0 && <p className="fine-print">Remainder cents are assigned individually so everyone’s shares add up exactly.</p>}
+            </section>
           )}
         </div>
         <div className="panel">
@@ -230,7 +232,7 @@ export function Pool({ trip, user, onUpdate, onInvite, onContribute, notify }) {
                     {member.id === trip.organizer
                       ? "Trip organizer"
                       : member.role === "viewer"
-                        ? "Viewer · can contribute"
+                        ? isPool ? "Viewer · can contribute" : "Viewer"
                         : "Editor"}
                   </small>
                 </div>
@@ -271,6 +273,7 @@ export function Pool({ trip, user, onUpdate, onInvite, onContribute, notify }) {
               </div>
             );
           })}
+          {!isPool && <div className="planning-crew-total"><span>Total estimated shares</span><strong>{money(trip.totals.shares.reduce((sum, share) => sum + share.owedCents, 0))}</strong></div>}
           <div className="panel-footer">
             <p className="fine-print">
               Shares update when people join or the budget changes. Any rounding
