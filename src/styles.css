@@ -3373,3 +3373,40 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{ou
 .app-shell .sidebar{background:var(--trip-sidebar);transition:background-color .8s ease}
 .app-shell .sidebar nav button.active{background:var(--trip-nav);color:var(--trip-sidebar)}
 @media(prefers-reduced-motion:reduce){.app-shell .sidebar{transition:none}}
+
+/* Motion vocabulary: entrances run once per mount, interactions respond to
+   intent, and no decorative animation loops distract from trip planning. */
+@keyframes soft-arrive{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes dialog-arrive{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes backdrop-arrive{from{opacity:0}to{opacity:1}}
+@keyframes icon-hello{0%{transform:rotate(-9deg) scale(.85)}60%{transform:rotate(5deg) scale(1.06)}100%{transform:rotate(0) scale(1)}}
+@keyframes scenic-reveal{from{opacity:.5;clip-path:inset(0 0 5% 0 round 14px)}to{opacity:1;clip-path:inset(0 round 10px)}}
+@media(prefers-reduced-motion:no-preference){
+ .trip-grid>.trip-tile-wrap,.trip-grid>.new-trip-tile,.category-grid>.category-card,.discovery-grid>.discovery-card,.timeline-item{animation:soft-arrive .55s cubic-bezier(.2,.75,.25,1) both;animation-delay:var(--entrance-delay,0ms)}
+ :is(.trip-grid,.category-grid,.discovery-grid)>:nth-child(2){--entrance-delay:65ms}
+ :is(.trip-grid,.category-grid,.discovery-grid)>:nth-child(3){--entrance-delay:130ms}
+ :is(.trip-grid,.category-grid,.discovery-grid)>:nth-child(4){--entrance-delay:195ms}
+ :is(.trip-grid,.category-grid,.discovery-grid)>:nth-child(n+5){--entrance-delay:240ms}
+ .modal[open]{animation:dialog-arrive .32s cubic-bezier(.2,.8,.2,1)}
+ .modal::backdrop,.mobile-backdrop{animation:backdrop-arrive .25s ease-out}
+ .toast{animation:soft-arrive .35s cubic-bezier(.2,.8,.2,1)}
+ .trip-hero,.discovery-hero{animation:scenic-reveal .7s ease-out}
+ .empty-icon{animation:icon-hello .6s ease-out}
+ .progress span{transition:width .8s cubic-bezier(.22,.75,.25,1)}
+ .btn svg,.text-link svg,.aside-link svg,.new-trip-nav svg,.icon-btn svg,.category-icon,.avatar-stack .avatar{transition:transform .28s cubic-bezier(.2,.8,.3,1)}
+ .btn:hover:not(:disabled) svg{transform:translateY(-2px) rotate(-6deg)}
+ .text-link:hover svg,.aside-link:hover svg{transform:translateX(4px)}
+ .new-trip-nav:hover svg{transform:rotate(90deg)}
+ .icon-btn:hover:not(:disabled) svg{transform:rotate(-12deg)}
+ .plan-category:hover .category-icon{transform:rotate(-7deg) scale(1.08)}
+ .hero-invite:hover .avatar-stack .avatar:nth-child(odd){transform:translateY(-4px) rotate(-6deg)}
+ .hero-invite:hover .avatar-stack .avatar:nth-child(even){transform:translateY(-2px) rotate(6deg)}
+ .category-card,.budget-item,.timeline-item,.discovery-tabs button{transition:background-color .25s,box-shadow .25s,border-color .25s}
+ .category-card:hover{box-shadow:0 8px 22px #264b3514}
+ .budget-item:hover{background:#fffdf894}
+ .vibe-postcard.chosen:hover{transform:translateY(-7px) translateZ(15px) rotateZ(-2deg);box-shadow:0 22px 34px #1d3b3438}
+ .assistant-fab{transition:transform .25s,box-shadow .25s}
+ .assistant-fab:hover{transform:translateY(-4px);box-shadow:0 12px 24px #203e3525}
+ .assistant-fab:hover>svg{animation:icon-hello .5s ease-out}
+ .trip-tile:active,.btn:active:not(:disabled){scale:.985}
+}
