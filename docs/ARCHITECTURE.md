@@ -1,3 +1,7 @@
+> Current implementation and remaining work: [Final audit](FINAL_AUDIT.md). This document retains earlier detail/history.
+
+> Current update: see [Vacation planning iteration](ITERATION_02.md) for accounts, permissions, imports, maps and seven vacation vibes. Earlier first-build entries below are historical where superseded.
+
 # Architecture and contracts
 
 ## Runtimes

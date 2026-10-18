@@ -1,5 +1,5 @@
 /** Shared integration result shapes. Amounts are integer cents; currency is explicit.
- * @typedef {{id:string,title:string,category:string,priceCents:number|null,currency:string,sourceUrl:string,checkedAt:string|null,location:string}} Recommendation
+ * @typedef {{id:string,title:string,description:string,kind:string,priceCents:null,url:string,coordinates:{lat:number,lng:number},distanceKm:number,reasons:string[],alreadySaved:boolean}} Recommendation
  * @typedef {{date:string,startTime:string,endTime:string,userId:string}} AvailabilityWindow
  * @typedef {{title:string,date:string,time:string,location:string}} CalendarEvent
  */

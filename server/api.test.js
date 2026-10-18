@@ -25,6 +25,7 @@ function fixture() {
         ...(body ? { body: JSON.stringify(body) } : {}),
       }),
       storage,
+      { allowDemo: true },
     );
     return {
       status: r.status,
@@ -114,6 +115,7 @@ test("planning mode rejects contributions; members can check off bookings", asyn
     await request("/trips", "POST", { ...tripInput, mode: "planning" }, a)
   ).data;
   await request("/join", "POST", { code: t.code }, b);
+  await request(`/trips/${t.id}/members/alex`, "PATCH", { role: "editor" }, a);
   const i = (
     await request(
       `/trips/${t.id}/items`,

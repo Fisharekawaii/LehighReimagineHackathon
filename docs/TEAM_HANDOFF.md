@@ -1,3 +1,7 @@
+> Current implementation and remaining work: [Final audit](FINAL_AUDIT.md). This document retains earlier detail/history.
+
+> Current update: see [Vacation planning iteration](ITERATION_02.md) for accounts, permissions, imports, maps and seven vacation vibes. Earlier first-build entries below are historical where superseded.
+
 # Team handoff
 
 This is a functional skeleton, not a promise that all integrations are connected. Branch from `feat/daytripper-first-build` until the team merges that foundation into its shared base branch. Do not merge or rewrite other teammates' changes without coordination.

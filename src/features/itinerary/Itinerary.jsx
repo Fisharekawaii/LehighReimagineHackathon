@@ -9,19 +9,27 @@ import {
 } from "lucide-react";
 import { SectionHeading, Button, Tag, Empty } from "../../components/UI";
 import { dateLabel, money } from "../../lib/format";
+import TripMap from "../maps/TripMap";
+import { api } from "../../lib/api";
 import CalendarPanel from "../calendar/CalendarPanel";
-// TODO(MAPS-01): Mount a map provider here using item.location and itinerary order.
-export default function Itinerary({ trip, onAdd, onEdit }) {
+// MAPS-01 implemented: saved pins, animated selection, route connections and travel estimates.
+export default function Itinerary({ trip, onAdd, onEdit, onUpdate, notify }) {
+  const plans = [...trip.items, ...(trip.stops || [])];
+  const stops = [...plans].sort(
+    (a, b) =>
+      (a.date || "9999").localeCompare(b.date || "9999") ||
+      (a.time || "99").localeCompare(b.time || "99"),
+  );
   const dates = [
-      ...new Set(trip.items.filter((i) => i.date).map((i) => i.date)),
+      ...new Set(plans.filter((i) => i.date).map((i) => i.date)),
     ].sort(),
-    unscheduled = trip.items.filter((i) => !i.date);
+    unscheduled = plans.filter((i) => !i.date);
   return (
     <>
       <SectionHeading
         eyebrow="Leave a little room for serendipity"
         title="Your days, taking shape."
-        description="Give any budget item a date and time to add it to your itinerary."
+        description="Your stays, little adventures and imported plans, all in one place."
         action={
           <Button onClick={() => onAdd()}>
             <Plus size={17} />
@@ -50,7 +58,7 @@ export default function Itinerary({ trip, onAdd, onEdit }) {
                   </div>
                 </div>
                 <div className="timeline">
-                  {trip.items
+                  {plans
                     .filter((i) => i.date === date)
                     .sort((a, b) =>
                       (a.time || "99").localeCompare(b.time || "99"),
@@ -59,7 +67,7 @@ export default function Itinerary({ trip, onAdd, onEdit }) {
                       <button
                         className="timeline-item"
                         key={i.id}
-                        onClick={() => onEdit(i)}
+                        onClick={() => !i.itineraryOnly && onEdit(i)}
                       >
                         <span className="timeline-time">
                           {i.time || "Anytime"}
@@ -72,7 +80,11 @@ export default function Itinerary({ trip, onAdd, onEdit }) {
                             {i.location || "Add a location"}
                           </p>
                         </div>
-                        <strong>{money(i.priceCents * i.quantity)}</strong>
+                        <strong>
+                          {i.itineraryOnly
+                            ? "Calendar plan"
+                            : money(i.priceCents * i.quantity)}
+                        </strong>
                       </button>
                     ))}
                 </div>
@@ -104,7 +116,7 @@ export default function Itinerary({ trip, onAdd, onEdit }) {
                 <button
                   key={i.id}
                   className="unscheduled-item"
-                  onClick={() => onEdit(i)}
+                  onClick={() => !i.itineraryOnly && onEdit(i)}
                 >
                   <span>{i.title}</span>
                   <span>
@@ -116,23 +128,35 @@ export default function Itinerary({ trip, onAdd, onEdit }) {
           )}
         </div>
         <aside className="itinerary-aside">
-          <div className="map-shell">
-            <div className="map-drawing" aria-hidden="true">
-              <div className="map-road one" />
-              <div className="map-road two" />
-              <div className="map-water" />
-              <MapPin className="map-pin" size={35} />
-            </div>
-            <div className="map-caption">
-              <Tag>Coming next</Tag>
-              <h3>Every stop, connected.</h3>
-              <p>
-                Interactive maps and routes will live here. Your locations are
-                saved with each item.
-              </p>
-            </div>
-          </div>
-          <CalendarPanel key={trip.id} trip={trip} />
+          {(trip.stops || []).length > 0 && trip.canEdit && (
+            <details className="panel">
+              <summary>Manage imported plans</summary>
+              {trip.stops.map((s) => (
+                <div className="unscheduled-item" key={s.id}>
+                  <span>{s.title}</span>
+                  <button
+                    className="text-link"
+                    onClick={async () => {
+                      try {
+                        onUpdate(
+                          await api(
+                            `/trips/${trip.id}/stops/${s.id}`,
+                            "DELETE",
+                          ),
+                        );
+                      } catch (e) {
+                        notify(e.message, true);
+                      }
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </details>
+          )}
+          <TripMap trip={trip} stops={stops} onUpdate={onUpdate} />
+          <CalendarPanel key={trip.id} trip={trip} onUpdate={onUpdate} />
         </aside>
       </div>
     </>

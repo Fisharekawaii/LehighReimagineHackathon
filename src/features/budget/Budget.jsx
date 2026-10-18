@@ -30,16 +30,63 @@ export const categoryMeta = [
   { name: "Experiences", icon: Ticket, color: "sage" },
   { name: "Other", icon: Package, color: "lilac" },
 ];
-export function ItemForm({ trip, item, category = "Stays", onClose, onSaved }) {
+export function ItemForm({
+  trip,
+  item: existing,
+  initialDraft,
+  category = "Stays",
+  onClose,
+  onSaved,
+}) {
+  const [draft, setDraft] = useState(initialDraft || null),
+    [draftMessage, setDraftMessage] = useState("");
+  const item = existing || draft;
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   return (
     <Modal
-      title={item ? "Edit the plan" : "Make room for a good idea."}
+      title={existing ? "Edit the plan" : "Make room for a good idea."}
       subtitle="Add an estimate now. Confirm the details as you go."
       onClose={onClose}
     >
+      {!existing && !initialDraft && (
+        <form
+          className="booking-import"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setBusy(true);
+            setError("");
+            try {
+              const data = await api(
+                `/trips/${trip.id}/booking/draft`,
+                "POST",
+                formData(e),
+              );
+              setDraft(data.draft);
+              setDraftMessage(data.warning);
+            } catch (e) {
+              setError(e.message);
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          <Field label="Found somewhere lovely? Paste a booking link">
+            <input
+              name="url"
+              type="url"
+              required
+              placeholder="https://www.airbnb.com/rooms/…"
+            />
+          </Field>
+          <Button variant="secondary" type="submit" busy={busy}>
+            Autofill a draft
+          </Button>
+          {draftMessage && <p className="info-note">{draftMessage}</p>}
+        </form>
+      )}
       <form
+        key={draft ? JSON.stringify(draft) : "manual"}
         className="form-stack"
         onSubmit={async (e) => {
           e.preventDefault();
@@ -48,9 +95,9 @@ export function ItemForm({ trip, item, category = "Stays", onClose, onSaved }) {
           try {
             onSaved(
               await api(
-                `/trips/${trip.id}/items${item ? "/" + item.id : ""}`,
-                item ? "PATCH" : "POST",
-                formData(e),
+                `/trips/${trip.id}/items${existing ? "/" + existing.id : ""}`,
+                existing ? "PATCH" : "POST",
+                {...formData(e), ...(item?.coordinates && formData(e).location === item.location ? {coordinates: item.coordinates} : {})},
               ),
             );
           } catch (e) {
@@ -97,7 +144,13 @@ export function ItemForm({ trip, item, category = "Stays", onClose, onSaved }) {
               max="1000000"
               step="0.01"
               required
-              defaultValue={item ? item.priceCents / 100 : ""}
+              defaultValue={
+                item
+                  ? item.priceCents != null
+                    ? item.priceCents / 100
+                    : item.price
+                  : ""
+              }
               placeholder="600"
             />
           </Field>
@@ -116,7 +169,7 @@ export function ItemForm({ trip, item, category = "Stays", onClose, onSaved }) {
             />
           </Field>
         </div>
-        <details>
+        <details open={initialDraft ? true : undefined}>
           <summary>Schedule, location & booking details</summary>
           <div className="form-stack detail-fields">
             <div className="form-row">
@@ -162,7 +215,7 @@ export function ItemForm({ trip, item, category = "Stays", onClose, onSaved }) {
         </details>
         <ErrorMessage error={error} />
         <Button type="submit" busy={busy}>
-          {item ? "Save changes" : "Add to the plan"}
+          {existing ? "Save changes" : "Add to the plan"}
           <Plus size={17} />
         </Button>
       </form>
@@ -281,11 +334,11 @@ export function Budget({ trip, onUpdate, onAdd, onEdit, notify }) {
                   <div className="item-price">
                     <strong>{money(item.priceCents * item.quantity)}</strong>
                     <small>
-                      {item.priceType === "quoted" ? "Quoted" : "Estimated"}
+                      {item.priceType === "quoted" ? "Quoted" : item.status !== "verified" ? "Estimated" : ""}
                     </small>
                   </div>
                   <button
-                    disabled={busy === item.id}
+                    disabled={!trip.canEdit || busy === item.id}
                     className={
                       "status-toggle " +
                       (item.status === "verified" ? "verified" : "")
@@ -297,6 +350,7 @@ export function Budget({ trip, onUpdate, onAdd, onEdit, notify }) {
                     {item.status === "verified" ? "Confirmed" : "To confirm"}
                   </button>
                   <button
+                    disabled={!trip.canEdit}
                     className="icon-btn"
                     aria-label={"Edit " + item.title}
                     onClick={() => onEdit(item)}
@@ -304,6 +358,7 @@ export function Budget({ trip, onUpdate, onAdd, onEdit, notify }) {
                     <Pencil size={16} />
                   </button>
                   <button
+                    disabled={!trip.canEdit}
                     className="icon-btn danger"
                     aria-label={"Delete " + item.title}
                     onClick={() => setRemoving(item)}

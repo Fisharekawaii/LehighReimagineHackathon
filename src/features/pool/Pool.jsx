@@ -86,11 +86,27 @@ export function ContributionForm({ trip, onClose, onSaved }) {
             placeholder="150"
           />
         </Field>
-        <Field label="Note (optional)">
+        <Field label="Sent via">
+          <input
+            name="method"
+            maxLength={80}
+            required
+            placeholder="Venmo, cash, bank transfer…"
+          />
+        </Field>
+        <Field label="What is this contribution for?">
+          <input
+            name="purpose"
+            maxLength={240}
+            required
+            placeholder="Our cottage, dinner, or anything you choose"
+          />
+        </Field>
+        <Field label="Additional note (optional)">
           <input
             name="note"
             maxLength={160}
-            placeholder="Sent via Venmo for the cottage"
+            placeholder="Anything else the organizer should know"
           />
         </Field>
         <div className="info-note">
@@ -213,9 +229,33 @@ export function Pool({ trip, user, onUpdate, onInvite, onContribute, notify }) {
                   <small>
                     {member.id === trip.organizer
                       ? "Trip organizer"
-                      : "Travel buddy"}
+                      : member.role === "viewer"
+                        ? "Viewer · can contribute"
+                        : "Editor"}
                   </small>
                 </div>
+                {isOwner && member.id !== trip.organizer && (
+                  <select
+                    aria-label={`Permission for ${member.name}`}
+                    value={member.role}
+                    onChange={async (e) => {
+                      try {
+                        onUpdate(
+                          await api(
+                            `/trips/${trip.id}/members/${member.id}`,
+                            "PATCH",
+                            { role: e.target.value },
+                          ),
+                        );
+                      } catch (e) {
+                        notify(e.message, true);
+                      }
+                    }}
+                  >
+                    <option value="viewer">Viewer</option>
+                    <option value="editor">Editor</option>
+                  </select>
+                )}
                 <div className="member-money">
                   <strong>{money(s.owedCents)}</strong>
                   <small>
@@ -256,7 +296,11 @@ export function Pool({ trip, user, onUpdate, onInvite, onContribute, notify }) {
                       <strong>
                         {firstName(member)} recorded {money(p.amountCents)}
                       </strong>
-                      <p className="item-meta">{p.note}</p>
+                      <p className="item-meta">
+                        Via {p.method || "External payment"} · For{" "}
+                        {p.purpose || "Trip contribution"}
+                        {p.note ? ` — ${p.note}` : ""}
+                      </p>
                     </div>
                     <Tag
                       tone={

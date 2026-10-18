@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { Wallet, ClipboardList, ArrowRight, Copy, Check } from "lucide-react";
 import { Modal, Field, Button, ErrorMessage } from "../../components/UI";
+import VibeGallery from "./VibeGallery";
+import { vibes } from "../../config/assets";
 import { api } from "../../lib/api";
 import { formData } from "../../lib/format";
 export function CreateTrip({ onClose, onSaved }) {
+  const [theme,setTheme] = useState("coast");
   const [mode, setMode] = useState("pool"),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
@@ -51,11 +54,14 @@ export function CreateTrip({ onClose, onSaved }) {
             <input type="date" name="end" required />
           </Field>
         </div>
+        <VibeGallery value={theme} onChange={setTheme}/>
         <Field label="Trip mood">
-          <select name="theme">
-            <option value="coast">Coastal escape</option>
-            <option value="forest">Into the outdoors</option>
-            <option value="city">City break</option>
+          <select name="theme" value={theme} onChange={e=>setTheme(e.target.value)}>
+            {Object.entries(vibes).map(([key, v]) => (
+              <option key={key} value={key}>
+                {v.label}
+              </option>
+            ))}
           </select>
         </Field>
         <fieldset>
@@ -146,9 +152,15 @@ export function JoinTrip({ initialCode = "", onClose, onSaved }) {
     </Modal>
   );
 }
-export function InviteTrip({ trip, onClose }) {
+export function InviteTrip({ trip, onClose, onUpdate }) {
   const [copied, setCopied] = useState("");
-  const link = window.location.origin + "/?join=" + trip.code;
+  const [role, setRole] = useState("viewer"),
+    [error, setError] = useState("");
+  const code =
+    role === "viewer"
+      ? trip.code
+      : trip.invites?.find((i) => i.role === "editor")?.code || "";
+  const link = code ? window.location.origin + "/?join=" + code : "";
   async function copy(value, type) {
     try {
       await navigator.clipboard.writeText(value);
@@ -160,47 +172,79 @@ export function InviteTrip({ trip, onClose }) {
   return (
     <Modal
       title="Better with your people."
-      subtitle="Share a link or invite code. Friends choose a demo profile, then join."
+      subtitle="Share a link or invite code. Friends sign in or create an account, then join."
       onClose={onClose}
     >
       <div className="form-stack">
-        <Field label="Invite code">
-          <div className="copy-row">
-            <input
-              value={trip.code}
-              readOnly
-              onFocus={(e) => e.target.select()}
-            />
-            <Button
-              variant="secondary"
-              onClick={() => copy(trip.code, "code")}
-              aria-label="Copy invite code"
-            >
-              {copied === "code" ? <Check size={18} /> : <Copy size={18} />}
-            </Button>
-          </div>
-        </Field>
-        <Field label="Invite link">
-          <div className="copy-row">
-            <input value={link} readOnly onFocus={(e) => e.target.select()} />
-            <Button
-              variant="secondary"
-              onClick={() => copy(link, "link")}
-              aria-label="Copy invite link"
-            >
-              {copied === "link" ? <Check size={18} /> : <Copy size={18} />}
-            </Button>
-          </div>
-        </Field>
-        <p className="fine-print" role="status">
-          {copied
-            ? "Copied—or select the text to copy manually."
-            : "New members are included in the equal split automatically."}
-        </p>
-        <p className="info-note">
-          Demo profiles are shared test identities. Use sample trip and payment
-          details.
-        </p>
+        {trip.role !== "organizer" ? (
+          <p>Ask your organizer to create an invite or change your access.</p>
+        ) : (
+          <>
+            <Field label="Invite permission">
+              <select value={role} onChange={(e) => setRole(e.target.value)}>
+                <option value="viewer">Viewer — can view and contribute</option>
+                <option value="editor">Editor — can also change plans</option>
+              </select>
+            </Field>
+            {!code && (
+              <Button
+                onClick={async () => {
+                  try {
+                    onUpdate(
+                      await api(`/trips/${trip.id}/invites`, "POST", { role }),
+                    );
+                  } catch (e) {
+                    setError(e.message);
+                  }
+                }}
+              >
+                Create editor invite
+              </Button>
+            )}
+            <ErrorMessage error={error} />
+            <Field label="Invite code">
+              <div className="copy-row">
+                <input
+                  value={code}
+                  readOnly
+                  onFocus={(e) => e.target.select()}
+                />
+                <Button
+                  variant="secondary"
+                  onClick={() => copy(code, "code")}
+                  aria-label="Copy invite code"
+                >
+                  {copied === "code" ? <Check size={18} /> : <Copy size={18} />}
+                </Button>
+              </div>
+            </Field>
+            <Field label="Invite link">
+              <div className="copy-row">
+                <input
+                  value={link}
+                  readOnly
+                  onFocus={(e) => e.target.select()}
+                />
+                <Button
+                  variant="secondary"
+                  onClick={() => copy(link, "link")}
+                  aria-label="Copy invite link"
+                >
+                  {copied === "link" ? <Check size={18} /> : <Copy size={18} />}
+                </Button>
+              </div>
+            </Field>
+            <p className="fine-print" role="status">
+              {copied
+                ? "Copied—or select the text to copy manually."
+                : "New members are included in the equal split automatically."}
+            </p>
+            <p className="info-note">
+              Anyone with this invite can join with its permission. Only the
+              organizer can change roles or confirm money received.
+            </p>
+          </>
+        )}
       </div>
     </Modal>
   );

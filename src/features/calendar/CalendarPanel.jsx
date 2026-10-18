@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { CalendarDays, Download, Check } from "lucide-react";
 import { Tag, Field, Button, ErrorMessage } from "../../components/UI";
 
+import CalendarImport from "./CalendarImport";
 const commonZones = [
   "UTC",
   "America/New_York",
@@ -29,13 +30,15 @@ function timeZones(current) {
   return [...new Set([current, ...commonZones, ...available])].sort();
 }
 
-export default function CalendarPanel({ trip }) {
+export default function CalendarPanel({ trip, onUpdate }) {
   const [timezone, setTimezone] = useState(deviceZone);
   const [duration, setDuration] = useState(60);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [downloaded, setDownloaded] = useState(false);
-  const count = trip.items.filter((item) => item.date).length;
+  const count = [...trip.items, ...(trip.stops || [])].filter(
+    (item) => item.date,
+  ).length;
   async function download(e) {
     e.preventDefault();
     setBusy(true);
@@ -155,10 +158,12 @@ export default function CalendarPanel({ trip }) {
           some apps.
         </p>
       </details>
+      <CalendarImport trip={trip} onUpdate={onUpdate} timezone={timezone} />
       <div className="calendar-future">
         <Tag>Still planned</Tag>
         <p>
-          Availability import and automatic calendar syncing are not connected.
+          Shared availability matching and automatic calendar syncing are still
+          planned.
         </p>
       </div>
       {/* TODO(CAL-02): Add availability import here. TODO(CAL-03): Shared zone and per-item end times. */}

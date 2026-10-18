@@ -13,10 +13,19 @@ import {
 } from "lucide-react";
 import { Button, Tag, Avatar, Empty } from "../../components/UI";
 import { money, dateRange, firstName } from "../../lib/format";
-import { themeImages } from "../../config/assets";
+import { themeImages, vibes } from "../../config/assets";
+import { api } from "../../lib/api";
 import { categoryMeta } from "../budget/Budget";
 import { PoolCard } from "../pool/Pool";
-export default function Overview({ trip, user, onTab, onAdd, onInvite }) {
+export default function Overview({
+  trip,
+  user,
+  onTab,
+  onAdd,
+  onInvite,
+  onUpdate,
+  notify,
+}) {
   const ready = trip.items.filter((i) => i.status === "verified").length,
     share = trip.totals.shares.find((s) => s.userId === user.id),
     pool = trip.mode === "pool";
@@ -30,7 +39,8 @@ export default function Overview({ trip, user, onTab, onAdd, onInvite }) {
       >
         <div className="hero-top">
           <span className="hero-kicker">
-            <Sun size={15} /> A little time away
+            <Sun size={15} />{" "}
+            {vibes[trip.theme]?.caption || "A little time away"}
           </span>
           <Tag>{pool ? "Shared pool" : "Planning only"}</Tag>
         </div>
@@ -64,6 +74,35 @@ export default function Overview({ trip, user, onTab, onAdd, onInvite }) {
             <Plus size={18} />
           </button>
         </div>
+      </div>
+      <div className="vibe-toolbar">
+        <span>Your getaway, your pace.</span>
+        <label>
+          Trip vibe{" "}
+          <select
+            aria-label="Trip vibe"
+            value={trip.theme}
+            disabled={!trip.canEdit}
+            onChange={async (e) => {
+              try {
+                onUpdate(
+                  await api(`/trips/${trip.id}/theme`, "PATCH", {
+                    theme: e.target.value,
+                  }),
+                );
+              } catch (e) {
+                notify(e.message, true);
+              }
+            }}
+          >
+            {Object.entries(vibes).map(([k, v]) => (
+              <option key={k} value={k}>
+                {v.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <Tag>{trip.role}</Tag>
       </div>
       <div className="stats-grid">
         <div className="stat">

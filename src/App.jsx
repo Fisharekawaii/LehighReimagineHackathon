@@ -21,6 +21,7 @@ import {
   Briefcase,
   CalendarDays,
 } from "lucide-react";
+import AuthForm from "./features/auth/AuthForm";
 import { api } from "./lib/api";
 import { money, dateRange, firstName } from "./lib/format";
 import {
@@ -58,7 +59,8 @@ export default function App() {
     [busy, setBusy] = useState(false),
     [toast, setToast] = useState(null),
     [mobile, setMobile] = useState(false),
-    [joinCode, setJoinCode] = useState("");
+    [joinCode, setJoinCode] = useState(""),
+    [syncError,setSyncError] = useState(false);
   const trip = trips.find((t) => t.id === tripId);
   const notify = useCallback(
     (text, isError = false) => setToast({ text, isError }),
@@ -104,16 +106,22 @@ export default function App() {
       active = false;
     };
   }, []);
-  // TODO(SYNC-01): Replace focus refresh with subscriptions when real collaboration is added.
+  // Shared server state: poll while visible; refresh immediately on focus.
   useEffect(() => {
     if (!user) return;
     const refresh = () => {
       api("/trips")
-        .then(setTrips)
-        .catch(() => {});
+        .then(data=>{setTrips(data);setSyncError(false);})
+        .catch(() => setSyncError(true));
     };
+    const timer = setInterval(() => {
+      if (!document.hidden) refresh();
+    }, 5000);
     window.addEventListener("focus", refresh);
-    return () => window.removeEventListener("focus", refresh);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+    };
   }, [user]);
   function update(next) {
     setTrips((prev) =>
@@ -163,8 +171,14 @@ export default function App() {
       notify(e.message, true);
     }
   }
-  const onAdd = (category = "Stays") => setModal({ type: "item", category }),
-    onEdit = (item) => setModal({ type: "item", item });
+  const onAdd = (category = "Stays") =>
+      trip?.canEdit
+        ? setModal({ type: "item", category })
+        : notify("Ask the organizer for edit access.", true),
+    onEdit = (item) =>
+      trip?.canEdit
+        ? setModal({ type: "item", item })
+        : notify("You have view access to this trip.");
   if (loading)
     return (
       <div className="loading-screen">
@@ -203,43 +217,38 @@ export default function App() {
           </span>
         </div>
         <main className="login-panel">
-          <Tag>Hackathon preview</Tag>
+          <Tag>Your next chapter</Tag>
           <h2>
             Your next adventure
             <br />
             starts with you.
           </h2>
-          <p className="muted">Choose a demo profile to explore DayTripper.</p>
-          <div className="profile-list">
-            {profiles.map((p) => (
-              <button key={p.id} disabled={busy} onClick={() => login(p.id)}>
-                <Avatar user={p} />
-                <span>
-                  <strong>{p.name}</strong>
-                  <small>Demo traveler</small>
-                </span>
-                <ArrowRight size={19} />
-              </button>
-            ))}
-          </div>
-          <ErrorMessage error={error} />
-          {!profiles.length && (
-            <Button onClick={() => window.location.reload()}>
-              Retry connection
-            </Button>
+          <AuthForm
+            onSignedIn={async (u) => {
+              setUser(u);
+              await loadTrips();
+              setModal(joinCode ? { type: "join" } : null);
+            }}
+          />
+          {profiles.length > 0 && (
+            <details>
+              <summary>Demo profiles</summary>
+              <div className="profile-list">
+                {profiles.map((p) => (
+                  <button key={p.id} onClick={() => login(p.id)}>
+                    <Avatar user={p} />
+                    {p.name}
+                  </button>
+                ))}
+              </div>
+            </details>
           )}
-          <div className="demo-disclosure">
-            <span className="status-dot" />
-            <p>
-              Demo accounts share test data. No passwords, real cards, or real
-              payments. Real sign-in is planned.
-            </p>
-          </div>
+          <ErrorMessage error={error} />
         </main>
       </div>
     );
   return (
-    <div className="app-shell">
+    <div className={"app-shell vibe-" + (trip?.theme || "coast")}>
       <aside className={"sidebar " + (mobile ? "open" : "")}>
         <Brand />
         <button
@@ -269,10 +278,12 @@ export default function App() {
           <ChevronDown size={16} />
         </button>
         <p className="nav-caption">{trip ? "YOUR TRIP" : "YOUR SPACE"}</p>
-        <nav>
-          {tabs.map(([id, label, Icon]) => (
+        <nav key={trip?.id || "no-trip"} className={trip ? "trip-nav-ready" : ""} aria-label="Trip sections">
+          {tabs.map(([id, label, Icon], index) => (
             <button
               key={id}
+              style={{"--nav-order": index}}
+              aria-current={trip && tab === id ? "page" : undefined}
               disabled={!trip}
               className={trip && tab === id ? "active" : ""}
               onClick={() => {
@@ -328,12 +339,12 @@ export default function App() {
             <Avatar user={user} />
             <div>
               <strong>{firstName(user)}</strong>
-              <small>Demo account</small>
+              <small>Traveler account</small>
             </div>
             <button
               className="icon-btn"
-              title="Switch demo profile"
-              aria-label="Switch demo profile"
+              title="Sign out"
+              aria-label="Sign out"
               onClick={logout}
             >
               <LogOut size={17} />
@@ -365,7 +376,7 @@ export default function App() {
           <div className="topbar-actions">
             <span className="saved-indicator">
               <span className="status-dot" />
-              Saved trips · demo
+              {syncError ? "Connection lost · retrying" : "Shared trips · auto-refresh"}
             </span>
             <button
               className="icon-btn"
@@ -526,6 +537,8 @@ export default function App() {
             <Overview
               trip={trip}
               user={user}
+              onUpdate={update}
+              notify={notify}
               onTab={setTab}
               onAdd={onAdd}
               onInvite={() => setModal({ type: "invite" })}
@@ -548,9 +561,15 @@ export default function App() {
               notify={notify}
             />
           ) : tab === "itinerary" ? (
-            <Itinerary trip={trip} onAdd={onAdd} onEdit={onEdit} />
+            <Itinerary
+              trip={trip}
+              onAdd={onAdd}
+              onEdit={onEdit}
+              onUpdate={update}
+              notify={notify}
+            />
           ) : (
-            <Explore trip={trip} onAdd={onAdd} />
+            <Explore key={trip.id} trip={trip} onAdd={onAdd} onDraft={draft => trip.canEdit && setModal({type: "item", draft})} />
           )}
         </main>
         <footer className="app-footer">
@@ -594,12 +613,17 @@ export default function App() {
         />
       )}{" "}
       {trip && modal?.type === "invite" && (
-        <InviteTrip trip={trip} onClose={() => setModal(null)} />
+        <InviteTrip
+          trip={trip}
+          onUpdate={update}
+          onClose={() => setModal(null)}
+        />
       )}{" "}
       {trip && modal?.type === "item" && (
         <ItemForm
           trip={trip}
           item={modal.item}
+          initialDraft={modal.draft}
           category={modal.category}
           onClose={() => setModal(null)}
           onSaved={savedItem}

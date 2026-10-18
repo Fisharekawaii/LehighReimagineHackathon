@@ -1,6 +1,8 @@
+> Current functionality, audit and demo checklist: [Final audit](docs/FINAL_AUDIT.md). Earlier iteration docs preserve history.
+
 # DayTripper
 
-A collaborative trip-planning skeleton for the Lehigh Reimagine Hackathon. React + Vite frontend, Node + Express API, persistent demo trips. **Working name; not final branding.**
+A collaborative trip planner for the Lehigh Reimagine Hackathon. React + Vite frontend, Node + Express API, persistent shared trips. **Working name; not final branding.**
 
 ## Run locally
 
@@ -11,7 +13,7 @@ npm ci
 npm run dev
 ```
 
-Open the Vite URL printed in the terminal (normally http://localhost:5173). The API runs on port 3001. Choose a demo profile; no credentials are needed.
+Open the Vite URL printed in the terminal (normally http://localhost:5173). The API runs on port 3001. Create an account with a username and password. Optional local demo profiles require `ENABLE_DEMO_LOGIN=true`; never enable them on a shared production server.
 
 For the built application:
 
@@ -36,13 +38,19 @@ npm test
 
 ## What works
 
-Demo profiles; create and join trips by link/code; saved trips; categorized budget CRUD; exact-cent equal splits; booking/task confirmations; dated itinerary and .ics calendar export; external contributions submitted by members and confirmed/rejected by the organizer; simulated shared card; responsive layout.
+Real username/password accounts; create and join trips by link/code; viewer/editor permissions; categorized budget CRUD; exact-cent equal splits; booking confirmations; editable booking-link drafts; calendar .ics import/export; saved map pins, animated selection, dotted itinerary legs and rough travel estimates; sourced nearby Discovery drafts; external contributions with method/purpose and organizer receipt review; seven visual trip themes and responsive layouts.
 
-## What is a shell
+Discovery uses Wikipedia's nearby-place API and Photon for address lookup without API keys. It focuses on outdoor places, culture and landmarks. Budget preferences affect distance ranking, not verified ticket prices. Dates affect seasonal suggestions and draft scheduling; opening hours and availability must be checked separately. Provider outages show retry/manual-entry states.
 
-Real authentication; AI provider; live nearby recommendations and prices; maps/routes; availability import/automatic calendar sync; booking APIs. The assistant has a clearly labeled deterministic demo command parser with preview/apply. Booking and discovery links open external websites; they do not import prices or make bookings.
+## Still planned / limits
 
-**No real cards or money movement.** Demo identities are shared by everyone who can access the app. Use sample data, not private information. The organizer permission is enforced by the API for the selected profile, but choosing demo profiles is intentionally not secure identity verification.
+- Model-backed natural-language assistant (current parser is explicitly demo-only).
+- Google OAuth and account recovery.
+- Shared calendar availability and automatic account sync; recurrence and per-event end times.
+- Verified booking inventory, live prices, restaurant/event recommendations and routed multimodal travel.
+- Real payment processing or card issuance: all contributions record transfers made elsewhere; the card is only a visualization.
+
+The Node JSON adapter is for a single process. The hosted D1 adapter persists shared data with optimistic updates; UI refreshes every five seconds. Sites hosting access and in-app membership are separate gates.
 
 ## Optional private review deployment
 

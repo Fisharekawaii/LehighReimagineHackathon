@@ -103,6 +103,7 @@ export function newItem(body, trip) {
     id: crypto.randomUUID(),
     title,
     category,
+    ...(body.coordinates ? {coordinates: coordinates(body.coordinates)} : {}),
     priceCents: cents(body.price),
     quantity,
     date,
@@ -113,4 +114,9 @@ export function newItem(body, trip) {
     status: "proposed",
     priceType: body.priceType === "quoted" ? "quoted" : "estimated",
   };
+}
+
+export function coordinates(value) {
+  if (!value || typeof value.lat !== 'number' || typeof value.lng !== 'number' || !Number.isFinite(value.lat) || !Number.isFinite(value.lng) || Math.abs(value.lat)>90 || Math.abs(value.lng)>180) fail('Choose a valid place on the map.');
+  return {lat:value.lat,lng:value.lng};
 }

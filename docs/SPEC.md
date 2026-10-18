@@ -1,3 +1,7 @@
+> Current implementation and remaining work: [Final audit](FINAL_AUDIT.md). This document retains earlier detail/history.
+
+> Current update: see [Vacation planning iteration](ITERATION_02.md) for accounts, permissions, imports, maps and seven vacation vibes. Earlier first-build entries below are historical where superseded.
+
 # Current spec — first skeleton, October 17, 2026
 
 The Google workbook is authoritative for product history. Diego authorized building at approximately 6:06 PM ET and clarified at approximately 6:08 PM ET that this run is the **main extensible skeleton for teammates to branch from**. Earlier “do not build” instructions in the historical log are superseded by that authorization.

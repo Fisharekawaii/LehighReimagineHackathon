@@ -28,7 +28,7 @@ const storage = {
 };
 app.use(
   "/api",
-  express.text({ type: "*/*", limit: "32kb" }),
+  express.text({ type: "*/*", limit: "350kb" }),
   async (req, res) => {
     try {
       const origin = `${req.protocol}://${req.get("host")}`;
@@ -39,7 +39,9 @@ app.use(
           ? { body: req.body || "" }
           : {}),
       });
-      const response = await handleApi(request, storage);
+      const response = await handleApi(request, storage, {
+        allowDemo: process.env.ENABLE_DEMO_LOGIN === "true",
+      });
       res.status(response.status);
       response.headers.forEach((v, k) => res.setHeader(k, v));
       res.send(await response.text());
