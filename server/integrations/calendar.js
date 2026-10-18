@@ -1,4 +1,3 @@
-import { IntegrationNotConfiguredError } from "./contracts.js";
 import { fail, validDate } from "../logic.js";
 
 // RFC 5545 TEXT escaping and UTF-8-aware folding. Keep this runtime-independent
@@ -190,7 +189,5 @@ export async function exportItinerary({
   };
 }
 
-// TODO(CAL-02): OAuth + availability import after export. No two-way sync promised.
-export async function importAvailability({ provider, start, end, userId }) {
-  throw new IntegrationNotConfiguredError("Availability import");
-}
+// Calendar scope: manual .ics import/export only. See calendar-import.js.
+// Account linking and automatic availability sync are intentionally out of scope.
