@@ -30,3 +30,5 @@ Calendars remain manual ICS import/export only. Removed the Still planned availa
 
 ## Planning-only group budget
 Replaced the planning-only group illustration with a real budget summary: total estimated plan cost, crew count, equal per-person estimate, and a total of all crew shares. Uses existing server integer-cent shares so remainder cents reconcile exactly; uneven splits show the one-cent range and an explanation. Each member retains their individual share. Updates follow existing shared trip refresh on edits/joins. Planning-mode viewers no longer say can contribute. Applies only to planning-only mode; no payment recording or card-mode behavior changes.
+
+Planning-only total row spacing: inset the total 20px to align with crew rows, restore 20px vertical padding, and allow the label/value to wrap cleanly on narrow screens.

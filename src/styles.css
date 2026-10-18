@@ -3455,6 +3455,6 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{ou
 .planning-share-summary h2{font:400 29px Georgia,serif;margin:0}.planning-share-summary>.muted{font-size:13px;line-height:1.6}
 .planning-total{display:block;font:400 clamp(38px,4vw,52px) Georgia,serif;margin:25px 0;color:var(--forest)}
 .planning-split-equation,.planning-share-amount,.planning-crew-total{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0;border-top:1px solid var(--border);font-size:13px}
-.planning-share-amount strong{font:400 26px Georgia,serif}.planning-crew-total{margin-top:18px;padding-bottom:0;font-weight:600}
+.planning-share-amount strong{font:400 26px Georgia,serif}.planning-crew-total{margin:18px 20px 0;padding:20px 0;font-weight:600;flex-wrap:wrap;row-gap:8px}.planning-crew-total strong{margin-left:auto;white-space:nowrap;font-variant-numeric:tabular-nums}
 .planning-share-summary .fine-print{line-height:1.6;margin-top:18px}
 @media(max-width:600px){.planning-share-summary{padding:22px}.planning-share-amount{flex-wrap:wrap}}
