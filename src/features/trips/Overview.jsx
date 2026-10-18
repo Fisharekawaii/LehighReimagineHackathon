@@ -46,6 +46,7 @@ export default function Overview({
           backgroundImage: `linear-gradient(90deg,rgba(15,46,43,.73),rgba(15,46,43,.08)),url(${themeImages[trip.theme]})`,
         }}
       >
+        <div key={trip.theme} className="theme-scenery" aria-hidden="true" style={{backgroundImage:`linear-gradient(90deg,rgba(15,46,43,.73),rgba(15,46,43,.08)),url(${themeImages[trip.theme]})`}}/>
         <div className="hero-top">
 
           <Tag>{pool ? "Shared pool" : "Planning only"}</Tag>

@@ -22,6 +22,7 @@ import {
   CalendarDays,
   Trash2,
 } from "lucide-react";
+import { tiltCard, resetTilt } from "./lib/motion";
 import AuthForm from "./features/auth/AuthForm";
 import { api } from "./lib/api";
 import { money, dateRange, firstName } from "./lib/format";
@@ -418,6 +419,7 @@ export default function App() {
                     <div className="trip-tile-wrap" key={t.id}>
                     <button
                       className={"trip-tile " + t.theme}
+                      onPointerMove={tiltCard} onPointerLeave={resetTilt} onPointerCancel={resetTilt}
                       key={t.id}
                       onClick={() => {
                         setTripId(t.id);
@@ -547,6 +549,7 @@ export default function App() {
           className={"toast " + (toast.isError ? "error" : "")}
           role={toast.isError ? "alert" : "status"}
         >
+          {!toast.isError && <span className="save-sparkles" aria-hidden="true">{Array.from({length:8}, (_,i)=><i key={i} style={{"--particle":i}}/>)}</span>}
           {toast.isError ? <X size={18} /> : <Check size={18} />}
           <span>{toast.text}</span>
           <button

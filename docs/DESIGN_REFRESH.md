@@ -15,3 +15,6 @@ Category-aware links: Transport suggests Uber/Lyft/Amtrak/Expedia; Food & drinks
 
 ## Motion polish
 Added staggered getaway/category/discovery entrances, scenic hero reveals, modal and backdrop entrances, toast arrival, progress-bar easing, and hover reactions for action icons, category icons, traveler avatars, the selected theme postcard, and assistant button. Decorative motion runs once or responds to interaction; no perpetual loops. All additions are gated by prefers-reduced-motion: no-preference. Existing map and theme transitions remain intact. CSS-only enhancement; no new dependencies or data changes.
+
+## Expressive motion follow-up
+Added bounded mouse-following 3D tilt to getaway and contribution cards, a moving light reflection, a single shimmer on getaway hover, a brief scenic zoom/crossfade when a theme changes, and a small particle burst on successful notification. Plus tiles, discovery filters and navigation icons get additional hover feedback. Pointer feedback skips touch and reduced-motion users; decorative layers ignore input. No autoplay loops or changes to financial functionality. Production build passes.

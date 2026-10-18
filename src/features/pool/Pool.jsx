@@ -1,3 +1,4 @@
+import { tiltCard, resetTilt } from "../../lib/motion";
 import React, { useState } from "react";
 import {
   Plus,
@@ -24,7 +25,7 @@ import { money, firstName, formData } from "../../lib/format";
 import { api } from "../../lib/api";
 export function PoolCard({ trip }) {
   return (
-    <div className="pool-card">
+    <div className="pool-card" onPointerMove={tiltCard} onPointerLeave={resetTilt} onPointerCancel={resetTilt}>
       <div className="pool-card-top">
         <span>daytripper.</span>
         <Tag>Simulated card</Tag>

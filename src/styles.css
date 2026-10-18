@@ -3410,3 +3410,36 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{ou
  .assistant-fab:hover>svg{animation:icon-hello .5s ease-out}
  .trip-tile:active,.btn:active:not(:disabled){scale:.985}
 }
+
+/* Expressive layer: bounded pointer tilt, theme scenery and brief celebrations. */
+.trip-hero{position:relative;isolation:isolate;overflow:hidden}
+.theme-scenery{position:absolute;inset:0;z-index:-1;background-size:cover;background-position:center 55%;pointer-events:none}
+.pool-card{position:relative;isolation:isolate;overflow:hidden}
+.pool-card::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at var(--light-x,30%) var(--light-y,20%),#ffffff28,transparent 58%);z-index:2;opacity:0;transition:opacity .35s}
+.save-sparkles{position:absolute;left:25px;top:50%;pointer-events:none}
+.save-sparkles i{position:absolute;width:5px;height:8px;border-radius:2px;background:#d5aa68;opacity:0}
+.save-sparkles i:nth-child(even){background:#77ad96;border-radius:50%}
+@keyframes scenery-drift{from{opacity:0;transform:scale(1.055)}30%{opacity:1}to{opacity:1;transform:scale(1)}}
+@keyframes celebration{0%{opacity:0;transform:rotate(calc(var(--particle)*45deg)) translateY(0) scale(.2)}25%{opacity:1}100%{opacity:0;transform:rotate(calc(var(--particle)*45deg)) translateY(-57px) rotate(150deg) scale(.5)}}
+@keyframes check-pop{0%{transform:scale(.4) rotate(-25deg)}60%{transform:scale(1.25) rotate(8deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes card-glint{from{transform:translateX(-160%) rotate(20deg)}to{transform:translateX(240%) rotate(20deg)}}
+@keyframes route-label-arrive{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+@media(prefers-reduced-motion:no-preference){
+ .theme-scenery{animation:scenery-drift 1.8s cubic-bezier(.2,.7,.3,1) both}
+ .trip-tile:hover{transform:perspective(1000px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg)) translateY(-6px);box-shadow:0 20px 36px #263d3222}
+ .pool-card{transition:transform .24s ease-out,box-shadow .3s}
+ .pool-card:hover{transform:perspective(900px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg)) translateY(-4px);box-shadow:0 22px 38px #203e3529}
+ .pool-card:hover::after{opacity:1}
+ .trip-tile-image::after{content:"";position:absolute;inset:-30%;width:65%;background:linear-gradient(90deg,transparent,#fff5,transparent);pointer-events:none;transform:translateX(-160%) rotate(20deg)}
+ .trip-tile:hover .trip-tile-image::after{animation:card-glint .9s ease-out}
+ .save-sparkles i{animation:celebration .85s ease-out both;animation-delay:calc(var(--particle)*18ms)}
+ .toast:not(.error)>svg{animation:check-pop .5s cubic-bezier(.2,.8,.3,1)}
+ .route-info{animation:route-label-arrive .45s ease-out}
+ .discovery-tabs button:hover{transform:translateY(-3px)}
+ .discovery-tabs button:active{transform:scale(.95)}
+ .new-trip-tile>span{transition:transform .4s cubic-bezier(.2,.8,.2,1),border-radius .4s}
+ .new-trip-tile:hover>span{transform:rotate(90deg) scale(1.12);border-radius:18px}
+ .sidebar nav button:not(.active):hover:not(:disabled)>svg{transform:rotate(-9deg) scale(1.12);transition:transform .25s}
+ .crew-person .avatar:hover,.member-row .avatar:hover{transform:translateY(-3px) rotate(6deg);transition:transform .25s}
+}
+@media(prefers-reduced-motion:reduce){.save-sparkles{display:none}.pool-card::after{transition:none}}
