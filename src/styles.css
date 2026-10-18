@@ -3458,3 +3458,69 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{ou
 .planning-share-amount strong{font:400 26px Georgia,serif}.planning-crew-total{margin:18px 20px 0;padding:20px 0;font-weight:600;flex-wrap:wrap;row-gap:8px}.planning-crew-total strong{margin-left:auto;white-space:nowrap;font-variant-numeric:tabular-nums}
 .planning-share-summary .fine-print{line-height:1.6;margin-top:18px}
 @media(max-width:600px){.planning-share-summary{padding:22px}.planning-share-amount{flex-wrap:wrap}}
+
+/* Travel-collage sidebar. Theme ink and paper stay coupled to the trip. */
+.app-shell .sidebar {
+  background: color-mix(in srgb, var(--trip-nav) 35%, #fff9ed);
+  color: var(--trip-sidebar); padding: 25px 19px 18px;
+  border-right: 1px solid color-mix(in srgb, var(--trip-sidebar) 20%, transparent);
+  overflow-y: auto; overflow-x: hidden;
+  background-image: radial-gradient(color-mix(in srgb, var(--trip-sidebar) 10%, transparent) .6px, transparent .6px);
+  background-size: 7px 7px;
+  transition: background-color .7s, color .7s, transform .3s;
+}
+.sidebar-wordmark { font-family: Georgia, serif; font-size: 52px; letter-spacing: -4px; font-weight: 900; line-height: .79; padding: 5px 4px 20px; }
+.sidebar-wordmark > span { display: block; }
+.sidebar-wordmark > span:last-child { margin-left: 13px; }
+.sidebar-period { color: #c54b2d; }
+.sidebar-sun { display: inline-grid; place-items: center; background: #f1b936; color: #42331c; width: 41px; height: 41px; border-radius: 50%; margin-left: 12px; vertical-align: middle; transform: rotate(-15deg); box-shadow: 2px 2px 0 var(--trip-sidebar); }
+.sidebar-sun svg { width: 30px; height: 30px; }
+.sidebar .workspace-switch { margin: 15px 0 21px; border: 1px solid var(--trip-sidebar); border-radius: 50px; padding: 8px 12px; color: var(--trip-sidebar); background: transparent; box-shadow: none; }
+.sidebar .workspace-switch.selected,.sidebar .workspace-switch:hover { background: var(--trip-nav); border-color: var(--trip-sidebar); }
+.sidebar .workspace-icon { background: transparent; border: 0; padding: 2px; color: inherit; }
+.sidebar .workspace-switch strong { font-size: 12px; }
+.sidebar .workspace-switch small { color: inherit; opacity: .7; }
+.sidebar-postcard { position: relative; background: #fffdf5; padding: 11px; margin: 18px 9px 28px; transform: none; border: 1px solid #24382a35; box-shadow: 4px 5px 0 color-mix(in srgb, var(--trip-sidebar) 17%, transparent); transition: transform .45s cubic-bezier(.2,.8,.2,1), box-shadow .45s; }
+.sidebar-postcard:hover { transform: translateY(-3px); box-shadow: 6px 9px 0 color-mix(in srgb, var(--trip-sidebar) 18%, transparent); }
+.sidebar-postcard-photo { height: 86px; background-position: center; background-size: cover; }
+.sidebar-postcard-label { display: flex; align-items: center; gap: 5px; justify-content: space-between; padding: 12px 2px 5px; font-size: 12px; font-weight: 700; }
+.sidebar-postcard-label span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-postcard-label svg { flex-shrink: 0; }
+.sidebar-postcard-tape { position: absolute; width: 63px; height: 19px; top: -11px; left: 34%; background: #edb95cba; transform: rotate(7deg); border-left: 2px dotted #fff8; border-right: 2px dotted #fff8; }
+.sidebar nav { gap: 6px; perspective: 650px; }
+.app-shell .sidebar nav button { border-radius: 5px 15px 15px 5px; min-height: 43px; padding: 10px 8px; gap: 8px; color: var(--trip-sidebar); font-size: 12px; border: 1px solid transparent; transform-origin: left center; transition: transform .28s cubic-bezier(.2,.9,.25,1.4), box-shadow .28s, background .28s; }
+.sidebar .nav-number { font: 10px monospace; opacity: .6; }
+.sidebar nav button > svg { width: 17px; height: 17px; flex-shrink: 0; stroke-width: 1.8; }
+.app-shell .sidebar nav button.active { background: var(--trip-sidebar); color: #fff9ed; border-color: var(--trip-sidebar); box-shadow: 3px 3px 0 #d3a549; transform: none; }
+.app-shell .sidebar nav button:hover:not(:disabled) { background: var(--trip-nav); color: var(--trip-sidebar); transform: translateX(4px); border-color: var(--trip-sidebar); box-shadow: 2px 3px 0 color-mix(in srgb,var(--trip-sidebar) 20%,transparent); }
+.app-shell .sidebar nav button.active:hover { background: var(--trip-sidebar); color: #fff9ed; }
+.app-shell .sidebar nav button:disabled { color: var(--trip-sidebar); opacity: .42; }
+.sidebar .new-trip-nav { background: #f1b936; color: #302d1d; border: 1.5px solid #302d1d; border-radius: 40px; box-shadow: 3px 4px 0 var(--trip-sidebar); justify-content: center; margin: 22px 4px 7px; padding: 12px; transform: none; transition: transform .25s, box-shadow .25s; }
+.sidebar .new-trip-nav:hover { transform: translateY(-3px); box-shadow: 5px 7px 0 var(--trip-sidebar); }
+.sidebar .new-trip-nav:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--trip-sidebar); }
+.sidebar .sidebar-bottom { padding-top: 24px; }
+.sidebar .assistant-promo { margin-bottom: 13px; }
+.sidebar .assistant-promo button { color: var(--trip-sidebar); border-top: 1px dashed currentColor; border-radius: 0; padding: 13px 4px 0; font-size: 11px; }
+.sidebar .user-profile { border-color: color-mix(in srgb,var(--trip-sidebar) 20%,transparent); padding-top: 12px; }
+.sidebar .user-profile strong,.sidebar .user-profile .icon-btn,.sidebar .user-profile small { color: var(--trip-sidebar); }
+.sidebar .user-profile small { opacity: .7; }
+.sidebar .mobile-close { color: var(--trip-sidebar); }
+.sidebar :is(button,a):focus-visible { outline: 2px solid var(--trip-sidebar); outline-offset: 4px; }
+@media(prefers-reduced-motion:no-preference) {
+ .sidebar-wordmark:hover .sidebar-sun { animation: sidebar-sun-spin 1.2s ease-in-out; }
+
+ .sidebar .trip-nav-ready button { animation: ticket-land .5s both; animation-delay: calc(var(--nav-order)*60ms); }
+ @keyframes sidebar-sun-spin { to { transform: rotate(345deg); } }
+ @keyframes postcard-land { from { opacity: 0; transform: translateY(-15px) rotate(9deg) scale(.92); } to { opacity: 1; transform: rotate(-4deg); } }
+ @keyframes ticket-land { from { opacity: 0; translate: -15px 0; } to { opacity: 1; translate: 0 0; } }
+}
+@media(max-width:960px) and (min-width:721px) { .app-shell .sidebar { padding: 23px 12px 15px; } .sidebar-wordmark { font-size: 43px; } .sidebar-sun { width: 32px; height: 32px; } .sidebar-sun svg { width: 25px; } .sidebar nav button .nav-number { display: none; } }
+@media(max-height:800px) { .sidebar-postcard-photo { height: 55px; } .sidebar-wordmark { font-size: 43px; padding-bottom: 10px; } .sidebar .workspace-switch { margin: 12px 0 18px; } .sidebar-postcard { margin-top: 16px; margin-bottom: 22px; } .sidebar .sidebar-bottom { padding-top: 17px; } }
+@media(prefers-reduced-motion:reduce) { .sidebar *, .sidebar *::before,.sidebar *::after { animation: none !important; transition: none !important; } }
+
+/* Original wordmark on the new paper sidebar; no angled controls. */
+.app-shell .sidebar .brand,.app-shell .sidebar .brand span,.app-shell .sidebar .brand strong { color: var(--trip-sidebar); }
+.app-shell .sidebar .brand { padding: 5px 4px 14px; }
+.app-shell .sidebar .brand .brand-dot { color: #df986b; }
+.sidebar nav button:not(.active):hover:not(:disabled)>svg { transform: none; }
+.sidebar-postcard-photo { background-repeat: no-repeat; }

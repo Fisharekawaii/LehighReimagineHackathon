@@ -272,6 +272,11 @@ export default function App() {
           <ChevronDown size={16} />
         </button>
 
+        <div className="sidebar-postcard">
+          <div className="sidebar-postcard-photo" style={{backgroundImage: `url(${themeImages[trip?.theme || "coast"]})`}} />
+          <div className="sidebar-postcard-label"><span title={trip?.title || "Your next getaway"}>{trip?.title || "Your next getaway"}</span><ArrowUpRight size={18} aria-hidden="true" /></div>
+          <span className="sidebar-postcard-tape" aria-hidden="true" />
+        </div>
         <nav key={trip?.id || "no-trip"} className={trip ? "trip-nav-ready" : ""} aria-label="Trip sections">
           {tabs.map(([id, label, Icon], index) => (
             <button
@@ -285,6 +290,7 @@ export default function App() {
                 setMobile(false);
               }}
             >
+              <span className="nav-number" aria-hidden="true">0{index + 1}</span>
               <Icon size={19} />
               <span>
                 {id === "pool" && trip?.mode === "planning"
