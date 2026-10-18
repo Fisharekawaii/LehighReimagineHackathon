@@ -12,8 +12,8 @@ export default function Assistant({ trip, onClose, onSaved }) {
     [busy, setBusy] = useState(false);
   return (
     <Modal
-      title="A little help with the details."
-      subtitle="A home for your future AI travel copilot."
+      title="Trip assistant"
+      subtitle="Try the supported demo commands below."
       onClose={onClose}
     >
       <div className="form-stack">

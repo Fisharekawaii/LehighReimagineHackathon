@@ -27,8 +27,7 @@ export default function Itinerary({ trip, onAdd, onEdit, onUpdate, notify }) {
   return (
     <>
       <SectionHeading
-        eyebrow="Leave a little room for serendipity"
-        title="Your days, taking shape."
+        title="Itinerary & map"
         description="Your stays, little adventures and imported plans, all in one place."
         action={
           <Button onClick={() => onAdd()}>
@@ -94,7 +93,7 @@ export default function Itinerary({ trip, onAdd, onEdit, onUpdate, notify }) {
             <div className="panel">
               <Empty
                 icon={CalendarDays}
-                title="The best weekends start with a loose plan."
+                title="No plans scheduled yet"
                 description="Add a date to an item in your budget and it will show up here."
                 action={
                   <Button variant="secondary" onClick={() => onAdd()}>

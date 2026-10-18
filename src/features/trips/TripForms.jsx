@@ -24,8 +24,8 @@ export function CreateTrip({ onClose, onSaved }) {
   }
   return (
     <Modal
-      title="A good trip starts here."
-      subtitle="Pick a place. Bring your people. Make it happen."
+      title="Create a trip"
+      subtitle="Choose your destination, dates, and trip vibe."
       onClose={onClose}
     >
       <form onSubmit={submit} className="form-stack">
@@ -116,7 +116,7 @@ export function JoinTrip({ initialCode = "", onClose, onSaved }) {
     [busy, setBusy] = useState(false);
   return (
     <Modal
-      title="Your people are waiting."
+      title="Join a trip"
       subtitle="Enter the invite code your organizer shared."
       onClose={onClose}
     >
@@ -171,7 +171,7 @@ export function InviteTrip({ trip, onClose, onUpdate }) {
   }
   return (
     <Modal
-      title="Better with your people."
+      title="Invite travelers"
       subtitle="Share a link or invite code. Friends sign in or create an account, then join."
       onClose={onClose}
     >

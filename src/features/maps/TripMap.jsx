@@ -154,7 +154,7 @@ export default function TripMap({ trip, stops, onUpdate }) {
       }}
     >
       <div className="route-heading">
-        <span className="eyebrow">THE SCENIC ROUTE</span>
+        <span className="eyebrow">Route</span>
         <Tag>{stops.filter((s) => s.coordinates).length} saved pins</Tag>
       </div>
       <div ref={canvas} className="live-map" />

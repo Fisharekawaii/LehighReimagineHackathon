@@ -86,7 +86,7 @@ export default function CalendarPanel({ trip, onUpdate }) {
     <div className="panel integration-card calendar-panel">
       <CalendarDays size={23} />
       <Tag tone="green">Export ready</Tag>
-      <h3>Take the plan with you.</h3>
+      <h3>Calendar export</h3>
       <p>
         Download {count} scheduled {count === 1 ? "item" : "items"} for Google
         Calendar, Apple Calendar, or Outlook.

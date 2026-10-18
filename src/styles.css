@@ -3288,3 +3288,53 @@ button:disabled {
 .trip-delete-button:hover{background:#fff;transform:translateY(-1px)}.trip-delete-button:focus-visible{outline:3px solid #b56e48;outline-offset:3px}.trip-tile-wrap .trip-tile-image>span:last-child{visibility:hidden}
 .delete-trip-actions{display:flex;justify-content:flex-end;gap:12px}.btn.danger-button{background:#963f35;border-color:#963f35;color:white}.btn.danger-button:hover{background:#7d332b}
 @media(prefers-reduced-motion:reduce){.trip-delete-button{transition:none}.trip-delete-button:hover{transform:none}}
+
+/* Resort refresh: functional copy, scenic imagery, and restrained motion.
+   Keep theme tokens above; future sections should use these shared surfaces. */
+:root{--forest:#234c40;--ink:#293e35;--muted:#69766b;--border:#dedfd3}
+.sidebar{background:#203e35;color:#f2eee3;border-right:0}
+.sidebar .brand,.sidebar .brand span,.sidebar .brand strong{color:#f6f0e2}
+.sidebar .workspace-switch{background:#ffffff08;border:1px solid #ffffff25;color:#f6f0e2;margin-top:36px;margin-bottom:28px;border-radius:9px}
+.sidebar .workspace-switch.selected{background:#ffffff13;border-color:#ffffff35}
+.sidebar .workspace-switch small,.sidebar .user-profile small{color:#bac9bf}
+.sidebar .workspace-icon{background:#d9e2c91c;color:#e4dabf}
+.sidebar nav button{color:#d5dfd6;border-radius:6px;transition:background .2s,color .2s,transform .2s}
+.sidebar nav button:hover:not(:disabled){background:#ffffff12;color:white;transform:translateX(3px)}
+.sidebar nav button.active{background:#ede9da;color:#213d33;box-shadow:inset 3px 0 #c9a977}
+.sidebar nav button:disabled{color:#a4b3a7;opacity:.55}
+.sidebar .new-trip-nav{color:#e5d8bc;border-color:#ffffff30}
+.sidebar .assistant-promo{padding:0;background:none;border:0;border-radius:0;margin-bottom:22px}
+.sidebar .assistant-promo button{color:#dfd9c4;background:transparent;width:100%;padding:12px 0;border-top:1px solid #ffffff25;border-radius:0;justify-content:space-between}
+.sidebar .user-profile{border-color:#ffffff25}.sidebar .user-profile strong,.sidebar .user-profile .icon-btn{color:#ececdf}
+.topbar{border-bottom:1px solid #d4d9cc;min-height:76px}.saved-indicator{font-size:11px}
+.main-content{padding-top:38px;animation:page-settle .42s ease-out both}
+.home-heading{align-items:center;margin-bottom:36px}.home-heading h1{font-size:clamp(38px,4.5vw,58px);letter-spacing:-1.7px;margin-bottom:12px}
+.home-heading .muted{font-size:13px}.section-heading h2{font-size:clamp(30px,3.3vw,42px)}
+.btn{border-radius:6px;transition:background .2s,box-shadow .2s,transform .2s}.btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 14px #203e3515}
+.btn:active:not(:disabled){transform:translateY(0)}
+.trip-grid{gap:26px}.trip-tile{border-radius:10px;border:1px solid #dedfd4;background:#fffdf7;box-shadow:0 7px 24px #253d3209;overflow:hidden;text-align:left}
+.trip-tile-image{height:260px;position:relative;isolation:isolate;overflow:hidden;background:none!important}
+.trip-tile-image::before{content:"";position:absolute;inset:0;background-image:var(--travel-photo);background-size:cover;background-position:center;z-index:-1;transition:transform .7s cubic-bezier(.2,.65,.3,1)}
+.trip-tile:hover .trip-tile-image::before{transform:scale(1.045)}
+.trip-tile-body{padding:26px}.trip-tile-body h2{font-size:30px;line-height:1.15;margin:10px 0 16px}.trip-tile-body .eyebrow{font-size:10px;color:#61715e}
+.trip-tile-footer{border-top:1px solid #e0e2d6;padding-top:20px;margin-top:24px}
+.new-trip-tile{border-radius:10px;border:1px dashed #b7c2b0;background:#ffffff25;min-height:260px;color:#385544;transition:background .25s,border-color .25s}
+.new-trip-tile:hover{background:#fffdf6;border-color:#45634f}.new-trip-tile h3{font:400 26px Georgia,serif}.trip-delete-button{border-radius:6px}
+.trip-hero{min-height:370px;border-radius:10px;padding:34px;background-position:center 55%;box-shadow:0 12px 35px #243d3110}
+.hero-top{justify-content:flex-end}.trip-hero h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(40px,5vw,68px);font-weight:400;letter-spacing:-1.6px;line-height:1.03;max-width:760px}
+.hero-bottom>div>p{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}.hero-invite{border-radius:6px;background:#fffdf012;backdrop-filter:blur(8px)}
+.vibe-toolbar{justify-content:flex-end;padding:16px 0;margin-bottom:12px}
+.stats-grid{background:#fffdf8a6;border:1px solid #dcdfd2;border-radius:8px;gap:0;overflow:hidden;margin-bottom:38px}
+.stat{background:transparent;border:0;border-right:1px solid #dcdfd2;border-radius:0;box-shadow:none;padding:24px}.stat:last-child{border-right:0}.stat strong{font-family:Georgia,serif;font-weight:400;font-size:34px}
+.plan-category-list{border-top:1px solid #d6dbce}.plan-category{border:0;border-bottom:1px solid #d6dbce;border-radius:0;background:transparent;box-shadow:none;margin:0;padding:22px 10px;transition:background .2s,padding .2s}
+.plan-category:hover{background:#fffdf795;padding-left:16px;box-shadow:none}.category-icon{border-radius:50%}.plan-category h3{font-size:15px}.plan-category p{font-size:12px}
+.panel,.crew-box,.calendar-panel,.route-card,.discovery-card{border-radius:9px;box-shadow:none}.overview-aside .pool-card{box-shadow:0 15px 24px #203e3518}
+.discovery-hero{min-height:260px;border-radius:10px;padding:32px;display:flex;align-items:center}.discovery-hero h2{font-size:clamp(40px,5vw,64px);margin:0 0 16px}.discovery-hero p{max-width:450px}.discovery-controls{border-radius:9px;margin-top:24px}.discovery-card{background:#fffdf8}
+.discovery-intro{border-top:1px solid #dce1d3;padding-top:24px}.discovery-intro span{font-size:19px}.app-footer{justify-content:flex-start;opacity:.7;padding-top:32px}.assistant-fab{border-radius:8px}
+.modal{border-radius:12px}.modal h2{font-family:Georgia,serif;font-weight:400}.login-panel h2{font-family:Georgia,serif;font-weight:400;font-size:42px}.login-story h1{font-family:Georgia,serif;font-weight:400}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid #aa7949;outline-offset:4px}
+@keyframes page-settle{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+@media(min-width:1350px){.trip-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.trip-tile-image{height:290px}}
+@media(max-width:900px){.stat{padding:20px}.stats-grid{gap:0}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid #dcdfd2}.trip-hero{min-height:330px;padding:28px}}
+@media(max-width:600px){.main-content{padding-top:24px}.home-heading{gap:20px}.home-heading h1{font-size:40px}.trip-grid{gap:20px}.trip-tile-image{height:235px}.trip-tile-body{padding:22px}.trip-hero{padding:24px;min-height:340px}.trip-hero h1{font-size:42px}.hero-details{gap:12px}.stat{padding:17px 13px}.stat strong{font-size:29px}.stat small{line-height:1.5}.discovery-hero{min-height:240px;padding:26px}.plan-category{padding:18px 0}.plan-category:hover{padding-left:0}.sidebar .workspace-switch{margin-top:26px}.new-trip-tile{min-height:180px}.topbar{min-height:64px}}
+@media(prefers-reduced-motion:reduce){.main-content{animation:none}.btn,.trip-tile-image::before,.plan-category,.new-trip-tile,.sidebar nav button{transition:none}.btn:hover:not(:disabled),.sidebar nav button:hover:not(:disabled),.trip-tile:hover .trip-tile-image::before{transform:none}}

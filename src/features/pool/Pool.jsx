@@ -144,8 +144,7 @@ export function Pool({ trip, user, onUpdate, onInvite, onContribute, notify }) {
   return (
     <>
       <SectionHeading
-        eyebrow="Good company. Clear expectations."
-        title={isPool ? "Group & pool" : "Your travel crew"}
+        title={isPool ? "Group & pool" : "Your group"}
         description={
           isPool
             ? `${firstName(owner)} collects contributions outside the app and confirms them here.`
@@ -341,7 +340,7 @@ export function Pool({ trip, user, onUpdate, onInvite, onContribute, notify }) {
           ) : (
             <Empty
               icon={Wallet}
-              title="A clear record for every contribution."
+              title="No contributions yet"
               description="Record money sent outside the app. It will appear here for the organizer to review."
             />
           )}

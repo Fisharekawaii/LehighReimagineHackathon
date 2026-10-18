@@ -38,10 +38,7 @@ export default function Overview({
         }}
       >
         <div className="hero-top">
-          <span className="hero-kicker">
-            <Sun size={15} />{" "}
-            {vibes[trip.theme]?.caption || "A little time away"}
-          </span>
+
           <Tag>{pool ? "Shared pool" : "Planning only"}</Tag>
         </div>
         <div className="hero-bottom">
@@ -70,13 +67,13 @@ export default function Overview({
                 <Avatar key={m.id} user={m} small />
               ))}
             </div>
-            <span>Bring your people</span>
+            <span>Invite travelers</span>
             <Plus size={18} />
           </button>
         </div>
       </div>
       <div className="vibe-toolbar">
-        <span>Your getaway, your pace.</span>
+
         <label>
           Trip vibe{" "}
           <select
@@ -110,7 +107,7 @@ export default function Overview({
             Trip estimate <Tag>USD</Tag>
           </span>
           <strong>{money(trip.totals.estimatedCents)}</strong>
-          <small>Every good idea, added up</small>
+          <small>{trip.items.length} planned {trip.items.length === 1 ? "item" : "items"}</small>
         </div>
         <div className="stat">
           <span>Your estimated share</span>
@@ -156,8 +153,7 @@ export default function Overview({
         <div>
           <div className="section-heading compact">
             <div>
-              <p className="eyebrow">The building blocks</p>
-              <h2>Make it your kind of trip.</h2>
+              <h2>Your plan</h2>
             </div>
             <button className="text-link" onClick={() => onTab("budget")}>
               View budget <ArrowUpRight size={16} />
@@ -182,11 +178,11 @@ export default function Overview({
                       {items.length
                         ? `${items.length} ${items.length === 1 ? "idea" : "ideas"} on the plan`
                         : {
-                            Stays: "Find your home away from home",
-                            "Food & drinks": "Good food, better company",
-                            Transport: "Getting there is part of the adventure",
-                            Experiences: "The things you’ll remember",
-                            Other: "Leave room for the unexpected",
+                            Stays: "Accommodation",
+                            "Food & drinks": "Meals and drinks",
+                            Transport: "Flights, transfers, and rentals",
+                            Experiences: "Activities and tickets",
+                            Other: "Other expenses",
                           }[name]}
                     </p>
                   </div>
@@ -196,21 +192,13 @@ export default function Overview({
               );
             })}
           </div>
-          <div className="gentle-note">
-            <Sun size={21} />
-            <p>
-              <strong>A plan everyone can get behind.</strong>
-              <br />
-              Add ideas now. Confirm the details together as you go.
-            </p>
-          </div>
+
         </div>
         <aside className="overview-aside">
           {pool ? (
             <>
               <div className="section-heading compact">
                 <div>
-                  <p className="eyebrow">Together, accounted for</p>
                   <h2>Your trip pool</h2>
                 </div>
               </div>
@@ -238,7 +226,7 @@ export default function Overview({
           )}
           <div className="crew-box">
             <div className="panel-heading">
-              <h3>Your people</h3>
+              <h3>Travelers</h3>
               <button className="text-link" onClick={onInvite}>
                 Invite <Plus size={15} />
               </button>

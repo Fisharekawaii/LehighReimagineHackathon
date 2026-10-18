@@ -10,7 +10,7 @@ export default function CalendarImport({ trip, onUpdate, timezone }) {
     [notice, setNotice] = useState("");
   return (
     <div className="calendar-import">
-      <h3>Bring your plans along.</h3>
+      <h3>Calendar import</h3>
       <p>
         Import an .ics file. Review events and places before adding them; no
         budget costs are created.

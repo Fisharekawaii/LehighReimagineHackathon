@@ -142,7 +142,7 @@ export default function App() {
       setJoinCode("");
       window.history.replaceState({}, "", window.location.pathname);
     }
-    notify("You’re in. Let’s make a good trip.");
+    notify("Trip saved.");
   }
   function savedItem(next) {
     update(next);
@@ -187,7 +187,7 @@ export default function App() {
       <div className="loading-screen">
         <Brand />
         <RefreshCw className="spin" size={23} />
-        <p>Making room for your next adventure…</p>
+        <p>Loading your trips…</p>
       </div>
     );
   if (!user)
@@ -199,9 +199,6 @@ export default function App() {
         >
           <Brand />
           <div className="login-story">
-            <span className="hero-kicker">
-              <Sun size={17} /> Less logistics. More living.
-            </span>
             <h1>
               Good trips.
               <br />
@@ -210,21 +207,15 @@ export default function App() {
               <em>All together.</em>
             </h1>
             <p>
-              A shared place for the plans, the possibilities,
-              <br />
-              and who’s bringing what to the table.
+              Plan your trip, share the budget, and keep everyone in sync.
             </p>
           </div>
-          <span className="login-caption">
-            A little time away goes a long way.
-          </span>
+
         </div>
         <main className="login-panel">
-          <Tag>Your next chapter</Tag>
+
           <h2>
-            Your next adventure
-            <br />
-            starts with you.
+            Welcome to DayTripper
           </h2>
           <AuthForm
             onSignedIn={async (u) => {
@@ -274,13 +265,12 @@ export default function App() {
           <span>
             <strong>My getaways</strong>
             <small>
-              {trips.length} {trips.length === 1 ? "trip" : "trips"} in the
-              making
+              {trips.length} {trips.length === 1 ? "trip" : "trips"}
             </small>
           </span>
           <ChevronDown size={16} />
         </button>
-        <p className="nav-caption">{trip ? "YOUR TRIP" : "YOUR SPACE"}</p>
+
         <nav key={trip?.id || "no-trip"} className={trip ? "trip-nav-ready" : ""} aria-label="Trip sections">
           {tabs.map(([id, label, Icon], index) => (
             <button
@@ -319,15 +309,6 @@ export default function App() {
         </button>
         <div className="sidebar-bottom">
           <div className="assistant-promo">
-            <span className="sparkle-tile">
-              <Sparkles size={19} />
-            </span>
-            <h3>
-              Less planning.
-              <br />
-              More possibility.
-            </h3>
-            <p>Your travel copilot is taking shape.</p>
             <button
               disabled={!trip}
               onClick={() => {
@@ -335,7 +316,7 @@ export default function App() {
                 setMobile(false);
               }}
             >
-              Try demo commands <ArrowUpRight size={16} />
+              Demo assistant <ArrowUpRight size={16} />
             </button>
           </div>
           <div className="user-profile">
@@ -379,7 +360,7 @@ export default function App() {
           <div className="topbar-actions">
             <span className="saved-indicator">
               <span className="status-dot" />
-              {syncError ? "Connection lost · retrying" : "Shared trips · auto-refresh"}
+              {syncError ? "Connection lost · retrying" : "Synced"}
             </span>
             <button
               className="icon-btn"
@@ -406,15 +387,15 @@ export default function App() {
             )}
           </div>
         </header>
-        <main className="main-content">
+        <main className="main-content" key={`${trip?.id || "home"}-${tab}`}>
           {!trip ? (
             <>
               <div className="home-heading">
                 <div>
-                  <p className="eyebrow">A change of scenery starts here</p>
-                  <h1>Where to next, {firstName(user)}?</h1>
+
+                  <h1>My getaways</h1>
                   <p className="muted">
-                    Big adventures. Long weekends. A plan everyone’s part of.
+                    {trips.length} {trips.length === 1 ? "trip" : "trips"} · Welcome back, {firstName(user)}
                   </p>
                 </div>
                 <div className="home-actions">
@@ -486,8 +467,7 @@ export default function App() {
                     <span>
                       <Plus size={25} />
                     </span>
-                    <h3>Room for one more adventure.</h3>
-                    <p>Create a new trip</p>
+                    <h3>Create a trip</h3>
                   </button>
                 </div>
               ) : (
@@ -496,48 +476,20 @@ export default function App() {
                   style={{ "--travel-photo": `url(${themeImages.coast})` }}
                 >
                   <div>
-                    <Tag>Your plans belong here</Tag>
+
                     <h2>
-                      The group chat
-                      <br />
-                      deserves a getaway.
+                      Your first getaway
                     </h2>
                     <p>
-                      Turn “we should go somewhere” into a trip.
-                      <br />
-                      One shared plan, with every detail in its place.
+                      Choose a destination and invite your group.
                     </p>
                     <Button onClick={() => setModal({ type: "create" })}>
                       Plan your first getaway <ArrowUpRight size={18} />
                     </Button>
                   </div>
-                  <div className="welcome-stamp">
-                    <Compass size={35} />
-                    <span>
-                      GOOD TIMES
-                      <br />
-                      AHEAD
-                    </span>
-                  </div>
+
                 </div>
               )}
-              <div className="home-principles">
-                <div>
-                  <Compass size={23} />
-                  <h3>One plan. Everyone in.</h3>
-                  <p>Bring your stays, food, and adventures together.</p>
-                </div>
-                <div>
-                  <Wallet size={23} />
-                  <h3>No awkward math.</h3>
-                  <p>See the estimate and everyone’s equal share.</p>
-                </div>
-                <div>
-                  <Users size={23} />
-                  <h3>Better, together.</h3>
-                  <p>Invite your people and make the details a group effort.</p>
-                </div>
-              </div>
             </>
           ) : tab === "overview" ? (
             <Overview
@@ -578,10 +530,7 @@ export default function App() {
             <Explore key={trip.id} trip={trip} onAdd={onAdd} onDraft={draft => trip.canEdit && setModal({type: "item", draft})} />
           )}
         </main>
-        <footer className="app-footer">
-          <span>A little less logistics. A little more getaway.</span>
-          <span>DayTripper · Built for going together</span>
-        </footer>
+        <footer className="app-footer"><span>DayTripper</span></footer>
       </div>
       {trip && (
         <button

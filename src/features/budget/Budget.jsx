@@ -45,7 +45,7 @@ export function ItemForm({
     [busy, setBusy] = useState(false);
   return (
     <Modal
-      title={existing ? "Edit the plan" : "Make room for a good idea."}
+      title={existing ? "Edit the plan" : "Add to your plan"}
       subtitle="Add an estimate now. Confirm the details as you go."
       onClose={onClose}
     >
@@ -71,7 +71,7 @@ export function ItemForm({
             }
           }}
         >
-          <Field label="Found somewhere lovely? Paste a booking link">
+          <Field label="Paste a booking link">
             <input
               name="url"
               type="url"
@@ -251,7 +251,6 @@ export function Budget({ trip, onUpdate, onAdd, onEdit, notify }) {
   return (
     <>
       <SectionHeading
-        eyebrow="A little planning, a lot of possibility"
         title="Plan & budget"
         description="Every idea, one shared plan. Estimates split equally as your group grows."
         action={
@@ -372,7 +371,7 @@ export function Budget({ trip, onUpdate, onAdd, onEdit, notify }) {
         ) : (
           <Empty
             icon={House}
-            title="Your next great trip is a blank canvas."
+            title="No items yet"
             description="Start with the stay, a meal, or something you can't wait to do."
             action={
               <Button
