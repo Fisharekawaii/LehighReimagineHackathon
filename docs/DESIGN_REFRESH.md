@@ -21,3 +21,6 @@ Added bounded mouse-following 3D tilt to getaway and contribution cards, a movin
 
 ## Tactile cards, without spotlight
 Removed the credit-card cursor-following white reflection at user request; retained its bounded tilt and softened the return easing. Added mouse-following tilt to budget category and discovery cards. Touch and reduced-motion behavior remains steady. Decorative entrance animations release their transform after completing so pointer feedback can take over.
+
+## Booking preview recovery
+Fixed false "blocked preview" reporting when a page has no title. Metadata extraction now preserves apostrophes, supports Twitter title/description and standard description metadata, and uses valid structured titles when a generic loading title is present. Partial address/price/description data survives missing titles; explicit valid URL dates survive unavailable previews. Null prices no longer become zero. Responses distinguish restricted vs unavailable previews and the draft offers an original-link shortcut for manual completion. Genuine provider access restrictions remain; no bypass or authenticated scraping. 27 tests pass, including targeted metadata/fallback cases. Exact failing user URL was not supplied, so provider-specific recovery is not claimed.

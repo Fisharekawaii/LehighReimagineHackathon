@@ -29,6 +29,21 @@ function allowed(value) {
     fail("Use an HTTPS Airbnb, Expedia, Booking.com, Vrbo or Hotels.com link.");
   return url;
 }
+const previewUnavailable = "Preview details aren’t available from this link. We kept the link and any dates provided; add the remaining details manually.";
+const challengeTitle = /^(?:access denied|forbidden|captcha|robot check|just a moment|redirecting|please wait|enable javascript|verify (?:you are|you're) human|security check)/i;
+function attributes(tag) {
+  const result = {};
+  // Match the opening quote, so apostrophes inside double-quoted content survive.
+  for (const a of tag.matchAll(/([\w:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/g))
+    result[a[1].toLowerCase()] = a[2] ?? a[3] ?? a[4];
+  return result;
+}
+function dateFromUrl(url) {
+  const date = url.searchParams.get("check_in") || url.searchParams.get("startDate");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date || "")) return undefined;
+  const parsed = new Date(date + "T00:00:00Z");
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0,10) === date ? date : undefined;
+}
 const decode = (s) =>
   String(s || "")
     .replace(/&amp;/g, "&")
@@ -41,10 +56,9 @@ const decode = (s) =>
 export function extractBooking(html, url) {
   const meta = {};
   for (const tag of html.matchAll(/<meta\b[^>]*>/gi)) {
-    const attrs = {};
-    for (const a of tag[0].matchAll(/([\w:-]+)\s*=\s*["']([^"']*)["']/g))
-      attrs[a[1].toLowerCase()] = a[2];
-    meta[attrs.property || attrs.name] = attrs.content;
+    const attrs = attributes(tag[0]);
+    const key = (attrs.property || attrs.name || "").toLowerCase();
+    if (attrs.content) meta[key] = attrs.content;
   }
   const nodes = [];
   const walk = (x) => {
@@ -55,6 +69,7 @@ export function extractBooking(html, url) {
     }
     nodes.push(x);
     if (x["@graph"]) walk(x["@graph"]);
+    if (x.mainEntity) walk(x.mainEntity);
   };
   for (const script of html.matchAll(
     /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi,
@@ -78,17 +93,14 @@ export function extractBooking(html, url) {
           .join(", ");
   const offer = Array.isArray(node.offers) ? node.offers[0] : node.offers;
   const price =
-    offer?.priceCurrency === "USD" && Number.isFinite(Number(offer?.price))
+    offer?.priceCurrency === "USD" && offer?.price != null && String(offer.price).trim() !== "" && Number.isFinite(Number(offer.price)) && Number(offer.price) >= 0
       ? Number(offer.price)
       : "";
   return {
-    title: decode(
-      meta["og:title"] ||
-        node.name ||
-        html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1],
-    ).slice(0, 100),
+    title: [meta["og:title"], node.name, meta["twitter:title"], html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]]
+      .map(decode).find(title => title && !challengeTitle.test(title))?.slice(0,100) || "",
     location: decode(address).slice(0, 150),
-    notes: decode(meta["og:description"] || node.description).slice(0, 500),
+    notes: decode(meta["og:description"] || meta["description"] || meta["twitter:description"] || node.description).slice(0, 500),
     price,
     quantity: 1,
     category: "Stays",
@@ -114,6 +126,7 @@ export async function bookingDraft(value, fetcher = fetch, category = "Stays") {
     quantity: 1,
     price: "",
     notes: "",
+    ...(dateFromUrl(reference) ? {date: dateFromUrl(reference)} : {}),
   };
   try {
     let response;
@@ -129,6 +142,7 @@ export async function bookingDraft(value, fetcher = fetch, category = "Stays") {
       }
       break;
     }
+    if ([401,403,429].includes(response.status)) return {draft:fallback, previewStatus:"restricted", warning:"This provider restricts automated previews. Your link is kept in this draft; enter the details manually."};
     if (!response.ok || !response.headers.get("content-type")?.includes("text/html")) throw new Error();
     let html = await readHtml(response);
     // Some booking providers return a successful HTML locale-redirect page,
@@ -148,25 +162,25 @@ export async function bookingDraft(value, fetcher = fetch, category = "Stays") {
       if(!response.ok||!response.headers.get("content-type")?.includes("text/html"))throw new Error();
       html=await readHtml(response);
     }
-    const draft = {...extractBooking(html, original), category};
-    // Only explicit URL dates are used; availability and totals cannot be inferred.
-    const date =
-      url.searchParams.get("check_in") || url.searchParams.get("startDate");
-    if (/^\d{4}-\d{2}-\d{2}$/.test(date || "")) draft.date = date;
-    const blocked =
-      !draft.title ||
-      /access denied|captcha|robot|just a moment|redirecting|redirect(?:ion)?\s+(?:to|in progress)|please wait|enable javascript/i.test(draft.title);
+    const draft = {...fallback, ...extractBooking(html, original), category};
+    const date = dateFromUrl(url) || dateFromUrl(reference);
+    if (date) draft.date = date;
+    const pageTitle = decode(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]);
+    const restricted = !draft.title && challengeTitle.test(pageTitle);
+    const useful = Boolean(draft.title || draft.location || draft.notes || draft.price !== "");
     return {
-      draft: blocked ? fallback : draft,
-      warning: blocked
-        ? "This provider blocked preview access. Fill out the draft manually."
-        : "Review every field. Prices may exclude fees, nights or taxes; only explicit USD prices are imported.",
+      draft: restricted ? fallback : draft,
+      previewStatus: restricted ? "restricted" : useful ? "available" : "unavailable",
+      warning: restricted
+        ? "This provider restricts automated previews. Your link is kept in this draft; enter the details manually."
+        : useful ? "Review the imported details. Missing fields need manual entry; only explicit USD prices are imported, and totals may exclude fees or taxes."
+        : previewUnavailable,
     };
   } catch {
     return {
       draft: fallback,
-      warning:
-        "This listing could not be read. The link is saved in your draft; add the remaining details manually.",
+      previewStatus: "unavailable",
+      warning: previewUnavailable,
     };
   }
 }

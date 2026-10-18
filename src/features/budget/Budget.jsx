@@ -92,7 +92,7 @@ export function ItemForm({
           <Button variant="secondary" type="submit" busy={busy}>
             Autofill a draft
           </Button>
-          {draftMessage && <p className="info-note">{draftMessage}</p>}
+          {draftMessage && <div className="info-note" role="status"><p>{draftMessage}</p>{draft?.url && <a href={draft.url} target="_blank" rel="noopener noreferrer">Open original link <ExternalLink size={13}/></a>}</div>}
         </form>
       )}
       <form

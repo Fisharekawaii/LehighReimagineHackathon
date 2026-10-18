@@ -120,3 +120,18 @@ test('category links retain transport and food categories with manual fallbacks'
  let fetched=false;const unknown=await bookingDraft('https://example.com/activity',()=>{fetched=true;},'Experiences');assert.equal(fetched,false);assert.equal(unknown.draft.category,'Experiences');
  await assert.rejects(()=>bookingDraft('https://www.uber.com/',fetch,'Invalid'));
 });
+
+test('preview parser preserves apostrophes, alternate metadata and partial drafts',async()=>{
+ const response=html=>async()=>new Response(html,{headers:{'content-type':'text/html'}});
+ const quoted=await bookingDraft('https://www.airbnb.com/rooms/1',response(`<meta property="og:title" content="Sailor's cottage"><meta name="description" content="By the harbor">`));
+ assert.equal(quoted.draft.title,"Sailor's cottage");assert.equal(quoted.draft.notes,'By the harbor');
+ const alternate=await bookingDraft('https://www.expedia.com/stay',response('<title>Please wait</title><script type="application/ld+json">{"@graph":[{"name":"River cabin","address":"12 River Road"}]}</script>'));
+ assert.equal(alternate.draft.title,'River cabin');assert.equal(alternate.previewStatus,'available');
+ const partial=await bookingDraft('https://www.booking.com/stay?check_in=2026-10-23',response('<script type="application/ld+json">{"address":"12 River Road","offers":{"priceCurrency":"USD","price":90}}</script>'));
+ assert.equal(partial.draft.location,'12 River Road');assert.equal(partial.draft.price,90);assert.equal(partial.draft.date,'2026-10-23');assert.equal(partial.previewStatus,'available');
+ const empty=await bookingDraft('https://www.airbnb.com/rooms/1',response('<html><body></body></html>'));
+ assert.equal(empty.previewStatus,'unavailable');assert.doesNotMatch(empty.warning,/blocked|restricts/);
+ const blocked=await bookingDraft('https://www.airbnb.com/rooms/1?check_in=2026-10-23',response('<title>Access denied</title>'));
+ assert.equal(blocked.previewStatus,'restricted');assert.equal(blocked.draft.date,'2026-10-23');assert.equal(blocked.draft.title,'');
+ assert.equal(extractBooking('<script type="application/ld+json">{"offers":{"priceCurrency":"USD","price":null}}</script>','x').price,'');
+});
